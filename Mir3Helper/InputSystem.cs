@@ -1,6 +1,9 @@
 namespace Mir3Helper
 {
 	using System;
+	using System.Linq;
+	using System.Reactive.Linq;
+	using System.Reactive.Threading.Tasks;
 	using System.Runtime.InteropServices;
 	using System.Threading.Channels;
 	using System.Threading.Tasks;
@@ -45,6 +48,7 @@ namespace Mir3Helper
 
 		async Task EventLoop()
 		{
+			Console.WriteLine("[InputSystem] Begin EventLoop");
 			while (await m_Channel.Reader.WaitToReadAsync())
 			while (m_Channel.Reader.TryRead(out int key))
 			{
@@ -60,6 +64,8 @@ namespace Mir3Helper
 					KeyHold?.Invoke((VirtualKey) key);
 				}
 			}
+
+			Console.WriteLine("[InputSystem] End EventLoop");
 		}
 
 		public void Dispose()
@@ -84,5 +90,17 @@ namespace Mir3Helper
 			IsKeyDown(VirtualKey.VK_SHIFT) ||
 			IsKeyDown(VirtualKey.VK_LSHIFT) ||
 			IsKeyDown(VirtualKey.VK_RSHIFT);
+
+		public IObservable<VirtualKey> ObserveKeyDown =>
+			Observable.FromEvent<VirtualKey>(h => KeyDown += h, h => KeyDown -= h);
+
+		public IObservable<VirtualKey> ObserveKeyHold =>
+			Observable.FromEvent<VirtualKey>(h => KeyHold += h, h => KeyHold -= h);
+
+		public IObservable<VirtualKey> ObserveKeyUp =>
+			Observable.FromEvent<VirtualKey>(h => KeyUp += h, h => KeyUp -= h);
+
+		public Task<VirtualKey> WaitKeyDown(params VirtualKey[] keys) => ObserveKeyDown
+			.FirstOrDefaultAsync(input => keys.Length == 0 || keys.Contains(input)).ToTask();
 	}
 }
