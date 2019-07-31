@@ -1,5 +1,6 @@
 namespace Mir3Helper
 {
+	using PInvoke;
 	using System;
 	using System.Linq;
 	using System.Reactive.Linq;
@@ -14,29 +15,48 @@ namespace Mir3Helper
 		public event Action<VirtualKey> KeyDown;
 		public event Action<VirtualKey> KeyHold;
 		public event Action<VirtualKey> KeyUp;
-		readonly int[] m_KeyState;
+		public Task ReaderTask { get; }
+		public bool IsDisposed { get; private set; }
+
+		readonly int[] m_KeyCounter;
 		readonly Channel<int> m_Channel;
+		int m_HookThreadId;
 		SafeHookHandle m_Hook;
 
 		public InputSystem()
 		{
-			m_KeyState = new int[256];
+			m_KeyCounter = new int[256];
 			m_Channel = Channel.CreateUnbounded<int>(new UnboundedChannelOptions {SingleReader = true});
+			ReaderTask = Task.Run(ReaderLoop);
 			Task.Factory.StartNew(HookKeyboard, TaskCreationOptions.LongRunning);
-			Task.Run(EventLoop);
 		}
 
-		unsafe void HookKeyboard()
+		async Task ReaderLoop()
 		{
-			m_Hook = SetWindowsHookEx(WindowsHookType.WH_KEYBOARD_LL, LowLevelKeyboardProc, IntPtr.Zero, 0);
-			Console.WriteLine($"[InputSystem] HookKeyboard {m_Hook.DangerousGetHandle() != IntPtr.Zero}");
-			MSG msg;
-			while (GetMessage(&msg, IntPtr.Zero, 0, 0) > 0)
+			while (await m_Channel.Reader.WaitToReadAsync())
+			while (m_Channel.Reader.TryRead(out int key))
 			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
+				if (key < 0)
+				{
+					key = ~key;
+					m_KeyCounter[key] = 0;
+					KeyUp?.Invoke((VirtualKey) key);
+				}
+				else
+				{
+					if (++m_KeyCounter[key] == 1) KeyDown?.Invoke((VirtualKey) key);
+					KeyHold?.Invoke((VirtualKey) key);
+				}
 			}
+		}
 
+		void HookKeyboard()
+		{
+			m_HookThreadId = Kernel32.GetCurrentThreadId();
+			m_Hook = SetWindowsHookEx(WindowsHookType.WH_KEYBOARD_LL, LowLevelKeyboardProc, IntPtr.Zero, 0);
+			Console.WriteLine($"[InputSystem] HookKeyboard {m_Hook.DangerousGetHandle()}");
+			MessageLoop();
+			Console.WriteLine($"[InputSystem] MessageLoop end");
 			Dispose();
 		}
 
@@ -47,38 +67,33 @@ namespace Mir3Helper
 				var type = (WindowMessage) wParam;
 				int key = Marshal.ReadInt32(lParam);
 				if (type == WindowMessage.WM_KEYUP || type == WindowMessage.WM_SYSKEYUP) key = ~key;
-				m_Channel.Writer.WriteAsync(key);
+				m_Channel.Writer.TryWrite(key);
 			}
 
 			return CallNextHookEx(m_Hook.DangerousGetHandle(), nCode, wParam, lParam);
 		}
 
-		async Task EventLoop()
+		static unsafe void MessageLoop()
 		{
-			while (await m_Channel.Reader.WaitToReadAsync())
-			while (m_Channel.Reader.TryRead(out int key))
+			MSG msg;
+			while (GetMessage(&msg, IntPtr.Zero, 0, 0) > 0)
 			{
-				if (key < 0)
-				{
-					key = ~key;
-					m_KeyState[key] = 0;
-					KeyUp?.Invoke((VirtualKey) key);
-				}
-				else
-				{
-					if (++m_KeyState[key] == 1) KeyDown?.Invoke((VirtualKey) key);
-					KeyHold?.Invoke((VirtualKey) key);
-				}
+				if (msg.message == CustomWindowMessage.StopMessageLoop) break;
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
 			}
 		}
 
 		public void Dispose()
 		{
+			if (IsDisposed) return;
+			IsDisposed = true;
 			m_Hook.Dispose();
+			PostThreadMessage(m_HookThreadId, CustomWindowMessage.StopMessageLoop, IntPtr.Zero, IntPtr.Zero);
 			m_Channel.Writer.TryComplete();
 		}
 
-		public bool IsKeyDown(VirtualKey key) => m_KeyState[(int) key] > 0;
+		public bool IsKeyDown(VirtualKey key) => m_KeyCounter[(int) key] > 0;
 
 		public bool IsCtrlDown() =>
 			IsKeyDown(VirtualKey.VK_CONTROL) || IsKeyDown(VirtualKey.VK_LCONTROL) || IsKeyDown(VirtualKey.VK_RCONTROL);

@@ -14,11 +14,13 @@
 			{
 				while (true)
 				{
-					var key = await Input.GetKeyDown();
-					if (key == User32.VirtualKey.VK_ESCAPE) break;
-					var window = User32.GetForegroundWindow();
-					string title = User32.GetWindowText(window);
-					Console.WriteLine(title);
+					await Input.GetKeyDown(User32.VirtualKey.VK_PRIOR);
+					var mir3 = Game.OpenForeground();
+					if (mir3 == null) continue;
+					using (mir3)
+					{
+						Console.WriteLine($"{mir3.Hp} {mir3.Mp}");
+					}
 				}
 			}
 		}
