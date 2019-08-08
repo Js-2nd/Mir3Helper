@@ -71,5 +71,14 @@ namespace Mir3Helper
 		public bool WriteUInt16(uint address, ushort value) => Write(address, value);
 		public bool WriteInt32(uint address, int value) => Write(address, value);
 		public bool WriteUInt32(uint address, uint value) => Write(address, value);
+
+		public bool WriteString(uint address, string value)
+		{
+			int length = value.Length;
+			int count = s_Encoding.GetMaxByteCount(length);
+			EnsureBufferSize(count);
+			count = s_Encoding.GetBytes(value, 0, length, m_Buffer, 0);
+			return WriteBuffer(address, count) == count;
+		}
 	}
 }
