@@ -42,9 +42,12 @@ namespace Mir3Helper
 		public int ReadInt32(uint address) => Read<int>(address);
 		public uint ReadUInt32(uint address) => Read<uint>(address);
 
-		public string ReadString(uint address, int length)
+		public string ReadString(uint address, int length, bool trimEnd = true)
 		{
 			int count = ReadBuffer(address, length);
+			if (trimEnd)
+				while (count > 0 && m_Buffer[count - 1] == 0)
+					count--;
 			return s_Encoding.GetString(m_Buffer, 0, count);
 		}
 
