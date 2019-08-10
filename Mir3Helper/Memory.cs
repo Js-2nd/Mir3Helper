@@ -48,7 +48,7 @@ namespace Mir3Helper
 			if (trimEnd)
 				while (count > 0 && m_Buffer[count - 1] == 0)
 					count--;
-			return s_Encoding.GetString(m_Buffer, 0, count);
+			return count > 0 ? s_Encoding.GetString(m_Buffer, 0, count) : string.Empty;
 		}
 
 		unsafe int WriteBuffer(uint address, int size)
