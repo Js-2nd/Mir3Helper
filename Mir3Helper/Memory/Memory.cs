@@ -83,5 +83,9 @@ namespace Mir3Helper
 			count = s_Encoding.GetBytes(value, 0, length, m_Buffer, 0);
 			return WriteBuffer(address, count) == count;
 		}
+
+		public (Memory, uint) ValueAddress(uint address) => (this, address);
+		public (Memory, uint, int) StringAddress(uint address, int size) => (this, address, size);
+		public (Memory, uint, uint) PointAddress(uint x, uint? y = null) => (this, x, y ?? x + sizeof(int));
 	}
 }

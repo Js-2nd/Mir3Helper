@@ -1,17 +1,17 @@
 namespace Mir3Helper
 {
 	using PInvoke;
+	using System;
 
 	public readonly struct Point
 	{
 		public readonly int X;
 		public readonly int Y;
 
-		public Point(int x, int y)
-		{
-			X = x;
-			Y = y;
-		}
+		public Point(int x, int y) => (X, Y) = (x, y);
+
+		public IntPtr ToLParam() => (IntPtr) ((X & 0xFFFF) | (Y << 16));
+		public override string ToString() => $"({X}, {Y})";
 
 		public static Point operator +(in Point p, in Point q) => (p.X + q.X, p.Y + q.Y);
 		public static Point operator -(in Point p, in Point q) => (p.X - q.X, p.Y - q.Y);

@@ -54,7 +54,7 @@ namespace Mir3Helper
 		{
 			m_HookThreadId = Kernel32.GetCurrentThreadId();
 			m_Hook = SetWindowsHookEx(WindowsHookType.WH_KEYBOARD_LL, LowLevelKeyboardProc, IntPtr.Zero, 0);
-			Console.WriteLine($"[InputSystem] HookKeyboard {m_Hook.DangerousGetHandle()}");
+			Console.WriteLine($"[InputSystem] HookKeyboard {m_Hook.DangerousGetHandle() != IntPtr.Zero}");
 			MessageLoop();
 			Console.WriteLine($"[InputSystem] MessageLoop end");
 			Dispose();
