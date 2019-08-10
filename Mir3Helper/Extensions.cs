@@ -5,6 +5,6 @@ namespace Mir3Helper
 
 	public static class Extensions
 	{
-		public static IntPtr ToLParam(this in POINT p) => (IntPtr) ((p.x & 0xFFFF) | (p.y << 16));
+		public static IntPtr LParam(this in POINT p) => (IntPtr) ((p.x & 0xFFFF) | (p.y << 16));
 	}
 }
