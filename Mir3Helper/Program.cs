@@ -38,15 +38,20 @@
 				var key = await m_Input.GetKeyDown();
 				if (key == VirtualKey.VK_PRIOR)
 				{
-					if (TrySetToForeground(ref m_User)) Console.WriteLine($"User={m_User.PlayerName}");
+					if (TrySetToForeground(ref m_User)) Console.WriteLine($"User => {m_User.PlayerName}");
 				}
 				else if (key == VirtualKey.VK_NEXT)
 				{
-					if (TrySetToForeground(ref m_Assist)) Console.WriteLine($"Assist={m_Assist.PlayerName}");
+					if (TrySetToForeground(ref m_Assist)) Console.WriteLine($"Assist => {m_Assist.PlayerName}");
 				}
 				else if (key == VirtualKey.VK_END)
 				{
 					m_Running = !m_Running;
+					Console.WriteLine(m_Running ? "Running" : "Paused");
+				}
+				else if (key == VirtualKey.VK_OEM_3)
+				{
+					await m_Assist.CoupleTeleport();
 				}
 			}
 		}
@@ -80,14 +85,14 @@
 
 			if (now >= m_HideTime)
 			{
-				m_Assist.Cast(3);
-				m_HideTime = now + TimeSpan.FromSeconds(20);
+				m_Assist.Cast(3, m_Assist.PlayerId);
+				m_HideTime = now + TimeSpan.FromSeconds(10);
 				return s_DefaultActionDelay;
 			}
 
 			if (Distance <= 9)
 			{
-				if (m_User.BuffAtkIce < 5)
+				if (m_User.BuffAtkIce + m_User.BuffAtkWind < 5)
 				{
 					m_Assist.Cast(9, m_User.PlayerId);
 					return s_DefaultActionDelay;
