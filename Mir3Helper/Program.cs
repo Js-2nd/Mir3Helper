@@ -80,13 +80,13 @@
 			{
 				await m_Assist.CoupleTeleport();
 				m_TeleportTime = now + TimeSpan.FromSeconds(3.5);
-				return s_DefaultActionDelay;
+				return TimeSpan.FromSeconds(2.5);
 			}
 
 			if (now >= m_HideTime)
 			{
-				m_Assist.Cast(3, m_Assist.PlayerId);
-				m_HideTime = now + TimeSpan.FromSeconds(10);
+				m_Assist.Cast(2, m_Assist.PlayerId);
+				m_HideTime = now + TimeSpan.FromSeconds(15);
 				return s_DefaultActionDelay;
 			}
 
