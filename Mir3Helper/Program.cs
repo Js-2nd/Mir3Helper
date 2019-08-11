@@ -22,6 +22,17 @@
 
 		async ValueTask Start()
 		{
+			Console.WriteLine(@"传奇3夫妻助手
+
+[PageUp]设置当前窗口为玩家角色（法师）
+[PageDown]设置当前窗口为辅助角色（道士）
+[End] 运行/暂停
+[`] 手动夫妻传送
+
+辅助角色（道士）需按如下设置
+F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
+以上魔法需设置为锁人锁怪或锁人不锁怪
+");
 			Task.Run(HandleInput).Forget();
 			while (true)
 			{
@@ -38,16 +49,16 @@
 				var key = await m_Input.GetKeyDown();
 				if (key == VirtualKey.VK_PRIOR)
 				{
-					if (TrySetToForeground(ref m_User)) Console.WriteLine($"User => {m_User.PlayerName}");
+					if (TrySetToForeground(ref m_User)) Console.WriteLine($"玩家角色 => {m_User.PlayerName}");
 				}
 				else if (key == VirtualKey.VK_NEXT)
 				{
-					if (TrySetToForeground(ref m_Assist)) Console.WriteLine($"Assist => {m_Assist.PlayerName}");
+					if (TrySetToForeground(ref m_Assist)) Console.WriteLine($"辅助角色 => {m_Assist.PlayerName}");
 				}
 				else if (key == VirtualKey.VK_END)
 				{
 					m_Running = !m_Running;
-					Console.WriteLine(m_Running ? "Running" : "Paused");
+					Console.WriteLine(m_Running ? "运行" : "暂停");
 				}
 				else if (key == VirtualKey.VK_OEM_3)
 				{
@@ -76,7 +87,7 @@
 		{
 			m_Distance = -1;
 			var now = DateTime.UtcNow;
-			if (now >= m_TeleportTime && Distance >= 7)
+			if (now >= m_TeleportTime && Distance >= 5)
 			{
 				await m_Assist.CoupleTeleport();
 				m_TeleportTime = now + TimeSpan.FromSeconds(3.5);
@@ -86,18 +97,27 @@
 			if (now >= m_HideTime)
 			{
 				m_Assist.Cast(2, m_Assist.PlayerId);
-				m_HideTime = now + TimeSpan.FromSeconds(15);
+				m_HideTime = now + TimeSpan.FromSeconds(20);
 				return s_DefaultActionDelay;
 			}
 
 			if (Distance <= 9)
 			{
-				if (m_User.BuffAtkIce + m_User.BuffAtkWind < 5)
+				if (m_User.BuffAtkFire + m_User.BuffAtkIce + m_User.BuffAtkThunder + m_User.BuffAtkWind < 5)
 				{
 					m_Assist.Cast(9, m_User.PlayerId);
 					return s_DefaultActionDelay;
 				}
+			}
 
+			if (m_Assist.Hp < m_Assist.MaxHp - 30)
+			{
+				m_Assist.Cast(1, m_Assist.PlayerId);
+				return s_DefaultActionDelay;
+			}
+
+			if (Distance >= 9)
+			{
 				if (m_User.BuffDef < 5)
 				{
 					m_Assist.Cast(8, m_User.PlayerId);
@@ -109,18 +129,12 @@
 					m_Assist.Cast(7, m_User.PlayerId);
 					return s_DefaultActionDelay;
 				}
-			}
 
-			if (m_Assist.Hp < m_Assist.MaxHp)
-			{
-				m_Assist.Cast(1, m_Assist.PlayerId);
-				return s_DefaultActionDelay;
-			}
-
-			if (Distance <= 9 && m_User.Hp < m_User.MaxHp)
-			{
-				m_Assist.Cast(1, m_User.PlayerId);
-				return s_DefaultActionDelay;
+				if (m_User.Hp < m_User.MaxHp - 30)
+				{
+					m_Assist.Cast(1, m_User.PlayerId);
+					return s_DefaultActionDelay;
+				}
 			}
 
 			return TimeSpan.FromSeconds(0.5);
