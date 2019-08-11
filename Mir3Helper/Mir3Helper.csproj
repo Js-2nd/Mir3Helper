@@ -91,11 +91,8 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="InputSystem.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Memory\Memory.cs" />
-    <Compile Include="Memory\MemoryPoint.cs" />
-    <Compile Include="Memory\MemoryString.cs" />
-    <Compile Include="Memory\MemoryValue.cs" />
-    <Compile Include="Memory\WritableMemoryValue.cs" />
+    <Compile Include="Memory.cs" />
+    <Compile Include="MemoryValue.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

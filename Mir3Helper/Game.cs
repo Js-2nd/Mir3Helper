@@ -33,37 +33,51 @@ namespace Mir3Helper
 			if (sendQ) Window.SendKey(VirtualKey.VK_Q);
 		}
 
-		public MemoryString PlayerName => Memory.StringAddress(0x0069DF00, 12);
-		public MemoryValue<int> PlayerId => Memory.ValueAddress(0x007A8024);
-		public MemoryValue<ushort> Hp => Memory.ValueAddress(0x007A82A2);
-		public MemoryValue<ushort> Mp => Memory.ValueAddress(0x007A82A6);
-		public MemoryValue<int> MaxHp => Memory.ValueAddress(0x007D8054);
-		public MemoryValue<int> MaxMp => Memory.ValueAddress(0x007D8058);
-		public MemoryPoint Pos => Memory.PointAddress(0x030341C0);
-		public WritableMemoryValue<int> AttackTarget => Memory.ValueAddress(0x007AC638);
-		public WritableMemoryValue<int> MagicTarget => Memory.ValueAddress(0x007AC63C);
-		public WritableMemoryValue<int> MagicTargetAlt => Memory.ValueAddress(0x007AC640);
+		public void Cast(ushort magic, int target = 0)
+		{
+			if (magic >= 1 && magic <= 12)
+			{
+				if (target != 0)
+				{
+					MagicTarget.Set(target);
+					MagicTargetAlt.Set(target);
+				}
 
-		public MemoryValue<int> BuffDefMagic => Memory.ValueAddress(0x007D53C4);
-		public MemoryValue<int> BuffAtk => Memory.ValueAddress(0x007D53C8);
-		public MemoryValue<int> BuffDef => Memory.ValueAddress(0x007D53CC);
-		public MemoryValue<int> BuffDefFire => Memory.ValueAddress(0x007D53D0);
-		public MemoryValue<int> BuffDefIce => Memory.ValueAddress(0x007D53D4);
-		public MemoryValue<int> BuffDefThunder => Memory.ValueAddress(0x007D53D8);
-		public MemoryValue<int> BuffDefWind => Memory.ValueAddress(0x007D53DC);
-		public MemoryValue<int> BuffAtkMagic => Memory.ValueAddress(0x007D53E0);
-		public MemoryValue<int> BuffAtkFire => Memory.ValueAddress(0x007D53E4);
-		public MemoryValue<int> BuffAtkIce => Memory.ValueAddress(0x007D53E8);
-		public MemoryValue<int> BuffAtkThunder => Memory.ValueAddress(0x007D53EC);
-		public MemoryValue<int> BuffAtkWind => Memory.ValueAddress(0x007D53F0);
-		public MemoryValue<int> BuffAtkHoly => Memory.ValueAddress(0x007D53F4);
+				Window.SendKey(VirtualKey.VK_F1 + magic - 1);
+			}
+		}
 
-		public MemoryValue<bool> StatusOpened => Memory.ValueAddress(0x0076F92C);
-		public MemoryPoint StatusClose => Memory.PointAddress(0x0076F9AC);
-		public Point StatusLeftRing => StatusClose.Value + (-256, 215);
-		public MemoryValue<bool> InventoryOpened => Memory.ValueAddress(0x006F3260);
-		public MemoryPoint InventoryClose => Memory.PointAddress(0x006F5878);
-		public Point InventoryAction => InventoryClose.Value + (-25, 10);
-		public MemoryValue<byte> TotalOpened => Memory.ValueAddress(0x006EF680);
+		public string PlayerName => Memory.ReadString(0x0069DF00, 12);
+		public int PlayerId => Memory.ReadInt32(0x007A8024);
+		public ushort Hp => Memory.ReadUInt16(0x007A82A2);
+		public ushort Mp => Memory.ReadUInt16(0x007A82A6);
+		public int MaxHp => Memory.ReadInt32(0x007D8054);
+		public int MaxMp => Memory.ReadInt32(0x007D8058);
+		public Point Pos => Memory.ReadPoint(0x030341C0);
+		public MemoryValue<int> AttackTarget => Memory.ValueAddress(0x007AC638);
+		public MemoryValue<int> MagicTarget => Memory.ValueAddress(0x007AC63C);
+		public MemoryValue<int> MagicTargetAlt => Memory.ValueAddress(0x007AC640);
+
+		public int BuffDefMagic => Memory.ReadInt32(0x007D53C4);
+		public int BuffAtk => Memory.ReadInt32(0x007D53C8);
+		public int BuffDef => Memory.ReadInt32(0x007D53CC);
+		public int BuffDefFire => Memory.ReadInt32(0x007D53D0);
+		public int BuffDefIce => Memory.ReadInt32(0x007D53D4);
+		public int BuffDefThunder => Memory.ReadInt32(0x007D53D8);
+		public int BuffDefWind => Memory.ReadInt32(0x007D53DC);
+		public int BuffAtkMagic => Memory.ReadInt32(0x007D53E0);
+		public int BuffAtkFire => Memory.ReadInt32(0x007D53E4);
+		public int BuffAtkIce => Memory.ReadInt32(0x007D53E8);
+		public int BuffAtkThunder => Memory.ReadInt32(0x007D53EC);
+		public int BuffAtkWind => Memory.ReadInt32(0x007D53F0);
+		public int BuffAtkHoly => Memory.ReadInt32(0x007D53F4);
+
+		public bool StatusOpened => Memory.ReadBoolean(0x0076F92C);
+		public Point StatusClose => Memory.ReadPoint(0x0076F9AC);
+		public Point StatusLeftRing => StatusClose + (-256, 215);
+		public bool InventoryOpened => Memory.ReadBoolean(0x006F3260);
+		public Point InventoryClose => Memory.ReadPoint(0x006F5878);
+		public Point InventoryAction => InventoryClose + (-25, 10);
+		public byte TotalOpened => Memory.ReadByte(0x006EF680);
 	}
 }

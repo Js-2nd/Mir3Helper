@@ -10,8 +10,11 @@ namespace Mir3Helper
 
 		public Point(int x, int y) => (X, Y) = (x, y);
 
+		public int ManhattanLength => Math.Abs(X) + Math.Abs(Y);
 		public IntPtr ToLParam() => (IntPtr) ((X & 0xFFFF) | (Y << 16));
 		public override string ToString() => $"({X}, {Y})";
+
+		public static int ManhattanDistance(in Point p, in Point q) => (p - q).ManhattanLength;
 
 		public static Point operator +(in Point p, in Point q) => (p.X + q.X, p.Y + q.Y);
 		public static Point operator -(in Point p, in Point q) => (p.X - q.X, p.Y - q.Y);

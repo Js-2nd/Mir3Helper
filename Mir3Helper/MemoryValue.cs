@@ -10,6 +10,7 @@ namespace Mir3Helper
 		MemoryValue(in Tuple t) => (Memory, Address) = t;
 
 		public T Value => this;
+		public void Set(T value) => Memory.Write(Address, value);
 		public override string ToString() => Value.ToString();
 
 		public static implicit operator MemoryValue<T>(in Tuple t) => new MemoryValue<T>(t);

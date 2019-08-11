@@ -51,6 +51,9 @@ namespace Mir3Helper
 			return count > 0 ? s_Encoding.GetString(m_Buffer, 0, count) : string.Empty;
 		}
 
+		public Point ReadPoint(uint addressX, uint? addressY = null) =>
+			(ReadInt32(addressX), ReadInt32(addressY ?? addressX + sizeof(int)));
+
 		unsafe int WriteBuffer(uint address, int size)
 		{
 			if (size > m_Buffer.Length) throw new ArgumentOutOfRangeException(nameof(size));
