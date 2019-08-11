@@ -14,8 +14,8 @@ namespace Mir3Helper
 		public Game(Process process)
 		{
 			Process = process;
-			Memory = new Memory(process.Handle);
-			Window = new Window(process.MainWindowHandle);
+			Memory = new Memory(process);
+			Window = new Window(process);
 		}
 
 		public void Dispose() => Process.Dispose();
@@ -53,7 +53,7 @@ namespace Mir3Helper
 		public ushort Mp => Memory.ReadUInt16(0x007A82A6);
 		public int MaxHp => Memory.ReadInt32(0x007D8054);
 		public int MaxMp => Memory.ReadInt32(0x007D8058);
-		public Point Pos => Memory.ReadPoint(0x030341C0);
+		public Point Pos => Memory.ReadPoint(Memory["kingmir3.dll+1141C0"]);
 		public MemoryValue<int> AttackTarget => Memory.ValueAddress(0x007AC638);
 		public MemoryValue<int> MagicTarget => Memory.ValueAddress(0x007AC63C);
 		public MemoryValue<int> MagicTargetAlt => Memory.ValueAddress(0x007AC640);

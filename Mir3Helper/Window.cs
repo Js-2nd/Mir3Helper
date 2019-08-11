@@ -2,12 +2,13 @@ namespace Mir3Helper
 {
 	using PInvoke;
 	using System;
+	using System.Diagnostics;
 	using static PInvoke.User32;
 
 	public sealed class Window
 	{
 		readonly IntPtr m_Handle;
-		public Window(IntPtr handle) => m_Handle = handle;
+		public Window(Process process) => m_Handle = process.MainWindowHandle;
 
 		public void SendMessage(WindowMessage message, IntPtr wParam = default, IntPtr lParam = default)
 		{

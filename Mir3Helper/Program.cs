@@ -54,7 +54,7 @@
 		bool TrySetToForeground(ref Game game)
 		{
 			var process = GetForegroundProcess();
-			if (process.ProcessName != "mir3" || game?.Process.Id == process.Id) return false;
+			if (process.ProcessName.ToLowerInvariant() != "mir3" || game?.Process.Id == process.Id) return false;
 			game = new Game(process);
 			m_Valid = m_User != null && m_Assist != null && m_User.Process.Id != m_Assist.Process.Id;
 			return true;

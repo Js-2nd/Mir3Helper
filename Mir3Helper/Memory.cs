@@ -2,6 +2,9 @@ namespace Mir3Helper
 {
 	using PInvoke;
 	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics;
+	using System.Globalization;
 	using System.Runtime.CompilerServices;
 	using System.Text;
 
@@ -9,10 +12,17 @@ namespace Mir3Helper
 	{
 		static readonly Encoding s_Encoding = Encoding.GetEncoding("gb2312");
 
-		readonly IntPtr m_Process;
+		readonly IntPtr m_Handle;
+		readonly Dictionary<string, uint> m_Modules = new Dictionary<string, uint>();
+		readonly Dictionary<string, uint> m_Caches = new Dictionary<string, uint>();
 		byte[] m_Buffer = new byte[16];
 
-		public Memory(IntPtr process) => m_Process = process;
+		public Memory(Process process)
+		{
+			m_Handle = process.Handle;
+			foreach (ProcessModule module in process.Modules)
+				m_Modules[module.ModuleName.ToLowerInvariant()] = (uint) module.BaseAddress;
+		}
 
 		void EnsureBufferSize(int size)
 		{
@@ -24,7 +34,7 @@ namespace Mir3Helper
 			EnsureBufferSize(size);
 			var count = IntPtr.Zero;
 			fixed (void* buffer = m_Buffer)
-				Kernel32.ReadProcessMemory(m_Process, (void*) address, buffer, (IntPtr) size, &count);
+				Kernel32.ReadProcessMemory(m_Handle, (void*) address, buffer, (IntPtr) size, &count);
 			return count.ToInt32();
 		}
 
@@ -59,7 +69,7 @@ namespace Mir3Helper
 			if (size > m_Buffer.Length) throw new ArgumentOutOfRangeException(nameof(size));
 			var count = IntPtr.Zero;
 			fixed (void* buffer = m_Buffer)
-				Kernel32.WriteProcessMemory(m_Process, (void*) address, buffer, (IntPtr) size, &count);
+				Kernel32.WriteProcessMemory(m_Handle, (void*) address, buffer, (IntPtr) size, &count);
 			return count.ToInt32();
 		}
 
@@ -90,5 +100,44 @@ namespace Mir3Helper
 		public (Memory, uint) ValueAddress(uint address) => (this, address);
 		public (Memory, uint, int) StringAddress(uint address, int size) => (this, address, size);
 		public (Memory, uint, uint) PointAddress(uint x, uint? y = null) => (this, x, y ?? x + sizeof(int));
+
+		public uint this[string address]
+		{
+			get
+			{
+				if (m_Caches.TryGetValue(address, out uint value)) return value;
+				m_Caches[address] = value = Resolve(address);
+				return value;
+			}
+		}
+
+		public uint Resolve(string address)
+		{
+			uint result = 0;
+			foreach (string str in address.ToLowerInvariant().Split('+'))
+			{
+				if (str.EndsWith(".exe") || str.EndsWith(".dll"))
+				{
+					if (m_Modules.TryGetValue(str, out uint value)) result += value;
+					else
+					{
+						Console.WriteLine($"Unknown module: {str}");
+						return 0;
+					}
+				}
+				else
+				{
+					if (uint.TryParse(str.Replace("0x", string.Empty),
+						NumberStyles.HexNumber, NumberFormatInfo.InvariantInfo, out uint value)) result += value;
+					else
+					{
+						Console.WriteLine($"Invalid address: {str}");
+						return 0;
+					}
+				}
+			}
+
+			return result;
+		}
 	}
 }
