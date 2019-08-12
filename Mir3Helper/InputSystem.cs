@@ -19,6 +19,7 @@ namespace Mir3Helper
 
 		readonly int[] m_KeyCounter;
 		readonly Channel<int> m_Channel;
+		readonly WindowsHookDelegate m_HookProc;
 		int m_HookThreadId;
 		SafeHookHandle m_Hook;
 
@@ -26,6 +27,7 @@ namespace Mir3Helper
 		{
 			m_KeyCounter = new int[256];
 			m_Channel = Channel.CreateUnbounded<int>(new UnboundedChannelOptions {SingleReader = true});
+			m_HookProc = LowLevelKeyboardProc;
 			Task.Run(ReaderLoop).Catch();
 			Task.Factory.StartNew(HookKeyboard, TaskCreationOptions.LongRunning).Catch();
 		}
@@ -52,7 +54,7 @@ namespace Mir3Helper
 		void HookKeyboard()
 		{
 			m_HookThreadId = Kernel32.GetCurrentThreadId();
-			m_Hook = SetWindowsHookEx(WindowsHookType.WH_KEYBOARD_LL, LowLevelKeyboardProc, IntPtr.Zero, 0);
+			m_Hook = SetWindowsHookEx(WindowsHookType.WH_KEYBOARD_LL, m_HookProc, IntPtr.Zero, 0);
 			Console.WriteLine($"[InputSystem] HookKeyboard {m_Hook.DangerousGetHandle() != IntPtr.Zero}");
 			MessageLoop();
 			Console.WriteLine($"[InputSystem] MessageLoop end");
