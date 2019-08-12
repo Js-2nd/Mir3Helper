@@ -20,17 +20,19 @@ namespace Mir3Helper
 
 		public void Dispose() => Process.Dispose();
 
-		public async ValueTask CoupleTeleport()
+		public async Task CoupleTeleport()
 		{
-			bool sendQ = !StatusOpened;
-			if (sendQ)
+			bool opened = StatusOpened;
+			if (opened)
 			{
 				Window.SendKey(VirtualKey.VK_Q);
 				await Task.Delay(10);
 			}
 
+			Window.SendKey(VirtualKey.VK_Q);
+			await Task.Delay(10);
 			Window.SendDoubleClick(StatusLeftRing);
-			if (sendQ) Window.SendKey(VirtualKey.VK_Q);
+			if (!opened) Window.SendKey(VirtualKey.VK_Q);
 		}
 
 		public void Cast(ushort magic, int target = 0)
@@ -54,6 +56,9 @@ namespace Mir3Helper
 		public int MaxHp => Memory.ReadInt32(0x007D8054);
 		public int MaxMp => Memory.ReadInt32(0x007D8058);
 		public Point Pos => Memory.ReadPoint(Memory["kingmir3.dll+1141C0"]);
+		public bool Moving => Memory.ReadBoolean(0x007A82C9);
+		public bool Casting => Memory.ReadBoolean(0x007A8298);
+		public bool Hiding => (Memory.ReadByte(0x007A82B2) & 0x80) != 0;
 		public MemoryValue<int> AttackTarget => Memory.ValueAddress(0x007AC638);
 		public MemoryValue<int> MagicTarget => Memory.ValueAddress(0x007AC63C);
 		public MemoryValue<int> MagicTargetAlt => Memory.ValueAddress(0x007AC640);

@@ -15,7 +15,6 @@ namespace Mir3Helper
 		public event Action<VirtualKey> KeyDown;
 		public event Action<VirtualKey> KeyHold;
 		public event Action<VirtualKey> KeyUp;
-		public Task ReaderTask { get; }
 		public bool IsDisposed { get; private set; }
 
 		readonly int[] m_KeyCounter;
@@ -27,8 +26,8 @@ namespace Mir3Helper
 		{
 			m_KeyCounter = new int[256];
 			m_Channel = Channel.CreateUnbounded<int>(new UnboundedChannelOptions {SingleReader = true});
-			ReaderTask = Task.Run(ReaderLoop);
-			Task.Factory.StartNew(HookKeyboard, TaskCreationOptions.LongRunning);
+			Task.Run(ReaderLoop).Catch();
+			Task.Factory.StartNew(HookKeyboard, TaskCreationOptions.LongRunning).Catch();
 		}
 
 		async Task ReaderLoop()

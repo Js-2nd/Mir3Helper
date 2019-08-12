@@ -8,7 +8,7 @@ namespace Mir3Helper
 	{
 		public static Point AsPoint(this in POINT p) => p;
 
-		public static void Forget(this Task task) =>
-			task.ContinueWith(t => Console.WriteLine(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
+		public static void Catch(this Task task) =>
+			task.ContinueWith(t => Console.Error.WriteLine(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
 	}
 }
