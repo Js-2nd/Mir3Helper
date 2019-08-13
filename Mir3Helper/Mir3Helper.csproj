@@ -89,6 +89,7 @@
   <ItemGroup>
     <Compile Include="CustomWindowMessage.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Game.Property.cs" />
     <Compile Include="InputSystem.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Memory.cs" />

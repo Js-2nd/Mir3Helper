@@ -3,14 +3,14 @@
 	using System;
 	using System.Diagnostics;
 	using System.IO;
+	using System.Linq;
 	using System.Threading.Tasks;
 	using static PInvoke.User32;
 
 	class Program
 	{
 		const string Version = "0.1.0";
-
-		static readonly TimeSpan s_DefaultActionDelay = TimeSpan.FromSeconds(1);
+		const double DefaultActionDelay = 1;
 
 		static async Task Main()
 		{
@@ -40,14 +40,14 @@
 
 辅助角色（道士）需按如下设置
 F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
-以上魔法需设置为锁人锁怪或锁人不锁怪
+以上魔法需设置为锁人不锁怪
 ");
 			Task.Run(HandleInput).Catch();
 			while (true)
 			{
 				try
 				{
-					if (m_Valid && m_Running) await Task.Delay(await Update());
+					if (m_Valid && m_Running) await Task.Delay(TimeSpan.FromSeconds(await Update()));
 					else await Task.Delay(100);
 				}
 				catch (Exception ex)
@@ -109,9 +109,11 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 			return Process.GetProcessById(processId);
 		}
 
-		async Task<TimeSpan> Update()
+		async Task<double> Update()
 		{
-			if (m_Assist.Moving || m_Assist.Casting) return TimeSpan.FromSeconds(0.1);
+			m_User.ClearCache();
+			m_Assist.ClearCache();
+			if (m_Assist.Moving || m_Assist.Casting) return 0.1;
 			m_Distance = -1;
 			var now = DateTime.UtcNow;
 			if (now >= m_TeleportTime && Distance >= 5)
@@ -119,25 +121,23 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				Console.WriteLine("夫妻传送");
 				await m_Assist.CoupleTeleport();
 				m_TeleportTime = now + TimeSpan.FromSeconds(3.5);
-				return TimeSpan.FromSeconds(2.5);
+				return 2.5;
 			}
 
 			if (!m_Same && !m_Assist.Hiding)
 			{
 				Console.WriteLine("隐身术");
 				m_Assist.Cast(2, m_Assist.Id);
-				return s_DefaultActionDelay;
+				return DefaultActionDelay;
 			}
 
 			if (Distance <= 9)
 			{
-				int buffAtk = Max(m_User.BuffAtkFire, m_User.BuffAtkIce,
-					m_User.BuffAtkThunder, m_User.BuffAtkWind, m_User.BuffAtkHoly);
-				if (buffAtk < 5)
+				if (m_User.AllBuffAtkMagic().All(buff => buff <= 5))
 				{
 					Console.WriteLine("强震魔法");
 					m_Assist.Cast(9, m_User.Id);
-					return s_DefaultActionDelay;
+					return DefaultActionDelay;
 				}
 			}
 
@@ -145,7 +145,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 			{
 				Console.WriteLine($"治愈术 => {m_Assist.Name}");
 				m_Assist.Cast(1, m_Assist.Id);
-				return s_DefaultActionDelay;
+				return DefaultActionDelay;
 			}
 
 			if (Distance <= 9)
@@ -154,27 +154,25 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				{
 					Console.WriteLine("神圣战甲术");
 					m_Assist.Cast(8, m_User.Id);
-					return s_DefaultActionDelay;
+					return DefaultActionDelay;
 				}
 
-				int buffDef = Max(m_User.BuffDefMagic, m_User.BuffDefFire,
-					m_User.BuffDefIce, m_User.BuffDefThunder, m_User.BuffDefWind);
-				if (buffDef < 5)
+				if (m_User.AllBuffDefMagic().All(t => t <= 5))
 				{
 					Console.WriteLine("幽灵盾");
 					m_Assist.Cast(7, m_User.Id);
-					return s_DefaultActionDelay;
+					return DefaultActionDelay;
 				}
 
 				if (!m_Same && m_User.Hp < m_User.MaxHp - 30)
 				{
 					Console.WriteLine($"治愈术 => {m_User.Name}");
 					m_Assist.Cast(1, m_User.Id);
-					return s_DefaultActionDelay;
+					return DefaultActionDelay;
 				}
 			}
 
-			return TimeSpan.FromSeconds(0.5);
+			return 0.5;
 		}
 
 		int Distance => m_Same ? 0 :
