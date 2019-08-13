@@ -1,6 +1,5 @@
 namespace Mir3Helper
 {
-	using PInvoke;
 	using System;
 	using System.Diagnostics;
 	using static PInvoke.User32;
@@ -10,33 +9,34 @@ namespace Mir3Helper
 		readonly IntPtr m_Handle;
 		public Window(Process process) => m_Handle = process.MainWindowHandle;
 
-		public void SendMessage(WindowMessage message, IntPtr wParam = default, IntPtr lParam = default)
+		public void Message(WindowMessage message, IntPtr wParam = default, IntPtr lParam = default, bool send = false)
 		{
-			User32.SendMessage(m_Handle, message, wParam, lParam);
+			if (send) SendMessage(m_Handle, message, wParam, lParam);
+			else PostMessage(m_Handle, message, wParam, lParam);
 		}
 
-		public void SendKey(VirtualKey key)
+		public void Key(VirtualKey key, bool send = false)
 		{
-			SendMessage(WindowMessage.WM_IME_KEYDOWN, (IntPtr) key);
+			Message(WindowMessage.WM_IME_KEYDOWN, (IntPtr) key, IntPtr.Zero, send);
 		}
 
-		public void SendClick(in Point point)
+		public void Click(in Point point, bool send = false)
 		{
 			var lParam = point.ToLParam();
-			SendMessage(WindowMessage.WM_LBUTTONDOWN, (IntPtr) MK.LBUTTON, lParam);
-			SendMessage(WindowMessage.WM_LBUTTONUP, IntPtr.Zero, lParam);
+			Message(WindowMessage.WM_LBUTTONDOWN, (IntPtr) MK.LBUTTON, lParam, send);
+			Message(WindowMessage.WM_LBUTTONUP, IntPtr.Zero, lParam, send);
 		}
 
-		public void SendDoubleClick(in Point point)
+		public void DoubleClick(in Point point, bool send = false)
 		{
-			SendMessage(WindowMessage.WM_LBUTTONDBLCLK, (IntPtr) MK.LBUTTON, point.ToLParam());
+			Message(WindowMessage.WM_LBUTTONDBLCLK, (IntPtr) MK.LBUTTON, point.ToLParam(), send);
 		}
 
-		public void SendRightClick(in Point point)
+		public void RightClick(in Point point, bool send = false)
 		{
 			var lParam = point.ToLParam();
-			SendMessage(WindowMessage.WM_RBUTTONDOWN, (IntPtr) MK.RBUTTON, lParam);
-			SendMessage(WindowMessage.WM_RBUTTONUP, IntPtr.Zero, lParam);
+			Message(WindowMessage.WM_RBUTTONDOWN, (IntPtr) MK.RBUTTON, lParam, send);
+			Message(WindowMessage.WM_RBUTTONUP, IntPtr.Zero, lParam, send);
 		}
 	}
 }

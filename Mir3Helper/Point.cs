@@ -12,7 +12,7 @@ namespace Mir3Helper
 
 		public int ManhattanLength => Math.Abs(X) + Math.Abs(Y);
 		public IntPtr ToLParam() => (IntPtr) ((X & 0xFFFF) | (Y << 16));
-		public override string ToString() => $"({X}, {Y})";
+		public override string ToString() => $"({X.ToString()}, {Y.ToString()})";
 
 		public static int ManhattanDistance(in Point p, in Point q) => (p - q).ManhattanLength;
 

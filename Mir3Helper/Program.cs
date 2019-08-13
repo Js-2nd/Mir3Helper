@@ -8,6 +8,8 @@
 
 	class Program
 	{
+		const string Version = "0.1.0";
+
 		static readonly TimeSpan s_DefaultActionDelay = TimeSpan.FromSeconds(1);
 
 		static async Task Main()
@@ -29,7 +31,7 @@
 
 		async Task Start()
 		{
-			Console.WriteLine(@"传奇3助手
+			Console.WriteLine($@"传奇3助手 v{Version}
 
 [PageUp]设置当前窗口为玩家角色（法师）
 [PageDown]设置当前窗口为辅助角色（道士）

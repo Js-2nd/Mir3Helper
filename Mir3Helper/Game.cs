@@ -20,19 +20,19 @@ namespace Mir3Helper
 
 		public void Dispose() => Process.Dispose();
 
-		public async Task CoupleTeleport()
+		public async Task CoupleTeleport(bool send = false)
 		{
 			bool opened = StatusOpened;
 			if (opened)
 			{
-				Window.SendKey(VirtualKey.VK_Q);
-				await Task.Delay(10);
+				Window.Key(VirtualKey.VK_Q, send);
+				await Task.Delay(20);
 			}
 
-			Window.SendKey(VirtualKey.VK_Q);
-			await Task.Delay(10);
-			Window.SendDoubleClick(StatusLeftRing);
-			if (!opened) Window.SendKey(VirtualKey.VK_Q);
+			Window.Key(VirtualKey.VK_Q, send);
+			await Task.Delay(20);
+			Window.DoubleClick(StatusLeftRing, send);
+			if (!opened) Window.Key(VirtualKey.VK_Q, send);
 		}
 
 		public void Cast(ushort magic, int target = 0)
@@ -45,14 +45,14 @@ namespace Mir3Helper
 					MagicTargetAlt.Set(target);
 				}
 
-				Window.SendKey(VirtualKey.VK_F1 + magic - 1);
+				Window.Key(VirtualKey.VK_F1 - 1 + magic);
 			}
 		}
 
 		public string PlayerName => Memory.ReadString(0x0069DF00, 12);
 		public int PlayerId => Memory.ReadInt32(0x007A8024);
-		public ushort Hp => Memory.ReadUInt16(0x007A82A2);
-		public ushort Mp => Memory.ReadUInt16(0x007A82A6);
+		public int Hp => Memory.ReadUInt16(0x007A82A2);
+		public int Mp => Memory.ReadUInt16(0x007A82A6);
 		public int MaxHp => Memory.ReadInt32(0x007D8054);
 		public int MaxMp => Memory.ReadInt32(0x007D8058);
 		public Point Pos => Memory.ReadPoint(Memory["kingmir3.dll+1141C0"]);
@@ -63,23 +63,23 @@ namespace Mir3Helper
 		public MemoryValue<int> MagicTarget => Memory.ValueAddress(0x007AC63C);
 		public MemoryValue<int> MagicTargetAlt => Memory.ValueAddress(0x007AC640);
 
-		public int BuffDefMagic => Memory.ReadInt32(0x007D53C4);
 		public int BuffAtk => Memory.ReadInt32(0x007D53C8);
-		public int BuffDef => Memory.ReadInt32(0x007D53CC);
-		public int BuffDefFire => Memory.ReadInt32(0x007D53D0);
-		public int BuffDefIce => Memory.ReadInt32(0x007D53D4);
-		public int BuffDefThunder => Memory.ReadInt32(0x007D53D8);
-		public int BuffDefWind => Memory.ReadInt32(0x007D53DC);
 		public int BuffAtkMagic => Memory.ReadInt32(0x007D53E0);
 		public int BuffAtkFire => Memory.ReadInt32(0x007D53E4);
 		public int BuffAtkIce => Memory.ReadInt32(0x007D53E8);
 		public int BuffAtkThunder => Memory.ReadInt32(0x007D53EC);
 		public int BuffAtkWind => Memory.ReadInt32(0x007D53F0);
 		public int BuffAtkHoly => Memory.ReadInt32(0x007D53F4);
+		public int BuffDef => Memory.ReadInt32(0x007D53CC);
+		public int BuffDefMagic => Memory.ReadInt32(0x007D53C4);
+		public int BuffDefFire => Memory.ReadInt32(0x007D53D0);
+		public int BuffDefIce => Memory.ReadInt32(0x007D53D4);
+		public int BuffDefThunder => Memory.ReadInt32(0x007D53D8);
+		public int BuffDefWind => Memory.ReadInt32(0x007D53DC);
 
 		public bool StatusOpened => Memory.ReadBoolean(0x0076F92C);
 		public Point StatusClose => Memory.ReadPoint(0x0076F9AC);
-		public Point StatusLeftRing => StatusClose + (-256, 215);
+		public Point StatusLeftRing => StatusClose + (-255, 215);
 		public bool InventoryOpened => Memory.ReadBoolean(0x006F3260);
 		public Point InventoryClose => Memory.ReadPoint(0x006F5878);
 		public Point InventoryAction => InventoryClose + (-25, 10);
