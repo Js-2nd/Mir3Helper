@@ -49,8 +49,8 @@ namespace Mir3Helper
 			}
 		}
 
-		public string PlayerName => Memory.ReadString(0x0069DF00, 12);
-		public int PlayerId => Memory.ReadInt32(0x007A8024);
+		public string Name => Memory.ReadString(0x0069DF00, 12);
+		public int Id => Memory.ReadInt32(0x007A8024);
 		public int Hp => Memory.ReadUInt16(0x007A82A2);
 		public int Mp => Memory.ReadUInt16(0x007A82A6);
 		public int MaxHp => Memory.ReadInt32(0x007D8054);

@@ -67,11 +67,13 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 					var key = await m_Input.GetKeyDown();
 					if (key == VirtualKey.VK_PRIOR)
 					{
-						if (TrySetToForeground(ref m_User)) Console.WriteLine($"玩家角色 => {m_User.PlayerName}");
+						TrySetToForeground(ref m_User);
+						if (m_User != null) Console.WriteLine($"玩家角色 => {m_User.Name}");
 					}
 					else if (key == VirtualKey.VK_NEXT)
 					{
-						if (TrySetToForeground(ref m_Assist)) Console.WriteLine($"辅助角色 => {m_Assist.PlayerName}");
+						TrySetToForeground(ref m_Assist);
+						if (m_Assist != null) Console.WriteLine($"辅助角色 => {m_Assist.Name}");
 					}
 					else if (key == VirtualKey.VK_END)
 					{
@@ -123,7 +125,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 			if (!m_Same && !m_Assist.Hiding)
 			{
 				Console.WriteLine("隐身术");
-				m_Assist.Cast(2, m_Assist.PlayerId);
+				m_Assist.Cast(2, m_Assist.Id);
 				return s_DefaultActionDelay;
 			}
 
@@ -134,15 +136,15 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				if (buffAtk < 5)
 				{
 					Console.WriteLine("强震魔法");
-					m_Assist.Cast(9, m_User.PlayerId);
+					m_Assist.Cast(9, m_User.Id);
 					return s_DefaultActionDelay;
 				}
 			}
 
 			if (m_Assist.Hp < m_Assist.MaxHp - 30)
 			{
-				Console.WriteLine($"治愈术 => {m_Assist.PlayerName}");
-				m_Assist.Cast(1, m_Assist.PlayerId);
+				Console.WriteLine($"治愈术 => {m_Assist.Name}");
+				m_Assist.Cast(1, m_Assist.Id);
 				return s_DefaultActionDelay;
 			}
 
@@ -151,7 +153,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				if (m_User.BuffDef < 5)
 				{
 					Console.WriteLine("神圣战甲术");
-					m_Assist.Cast(8, m_User.PlayerId);
+					m_Assist.Cast(8, m_User.Id);
 					return s_DefaultActionDelay;
 				}
 
@@ -160,14 +162,14 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				if (buffDef < 5)
 				{
 					Console.WriteLine("幽灵盾");
-					m_Assist.Cast(7, m_User.PlayerId);
+					m_Assist.Cast(7, m_User.Id);
 					return s_DefaultActionDelay;
 				}
 
 				if (!m_Same && m_User.Hp < m_User.MaxHp - 30)
 				{
-					Console.WriteLine($"治愈术 => {m_User.PlayerName}");
-					m_Assist.Cast(1, m_User.PlayerId);
+					Console.WriteLine($"治愈术 => {m_User.Name}");
+					m_Assist.Cast(1, m_User.Id);
 					return s_DefaultActionDelay;
 				}
 			}
