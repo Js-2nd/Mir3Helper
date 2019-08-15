@@ -84,6 +84,11 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 					{
 						if (m_Assist != null) await m_Assist.CoupleTeleport();
 					}
+					else if (key == VirtualKey.VK_RSHIFT)
+					{
+						Game game = null;
+						if (TrySetToForeground(ref game)) game.ClickItemAndInventoryAction();
+					}
 				}
 				catch (Exception ex)
 				{
@@ -133,7 +138,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 
 			if (Distance <= 9)
 			{
-				if (m_User.AllBuffAtkMagic().All(buff => buff <= 5))
+				if (m_User.AllBuffAtkMagic().All(buff => buff < 3))
 				{
 					Console.WriteLine("强震魔法");
 					m_Assist.Cast(9, m_User.Id);
@@ -141,7 +146,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				}
 			}
 
-			if (m_Assist.Hp < m_Assist.MaxHp - 30)
+			if (m_Assist.Hp < m_Assist.MaxHp - 20)
 			{
 				Console.WriteLine($"治愈术 => {m_Assist.Name}");
 				m_Assist.Cast(1, m_Assist.Id);
@@ -157,7 +162,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 					return DefaultActionDelay;
 				}
 
-				if (m_User.AllBuffDefMagic().All(t => t <= 5))
+				if (m_User.AllBuffDefMagic().All(t => t < 5))
 				{
 					Console.WriteLine("幽灵盾");
 					m_Assist.Cast(7, m_User.Id);
@@ -178,16 +183,5 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 		int Distance => m_Same ? 0 :
 			m_Distance >= 0 ? m_Distance :
 			m_Distance = Point.ManhattanDistance(m_User.Pos, m_Assist.Pos);
-
-		int Max(params int[] values)
-		{
-			int count = values.Length;
-			if (count == 0) return 0;
-			int result = values[0];
-			for (int i = 1; i < count; i++)
-				if (result < values[i])
-					result = values[i];
-			return result;
-		}
 	}
 }

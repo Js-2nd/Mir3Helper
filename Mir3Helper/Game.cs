@@ -41,12 +41,21 @@ namespace Mir3Helper
 			{
 				if (target != 0)
 				{
-					MagicTarget.Set(target);
+//					MagicTarget.Set(target);
 					MagicTargetAlt.Set(target);
 				}
 
 				Window.Key(VirtualKey.VK_F1 - 1 + magic);
 			}
+		}
+
+		public void ClickItemAndInventoryAction(bool send = false)
+		{
+			if (!InventoryOpened) return;
+			GetCursorPos(out var pos);
+			ScreenToClient(Process.MainWindowHandle, ref pos);
+			Window.Click(pos, send);
+			Window.Click(InventoryAction, send);
 		}
 	}
 }
