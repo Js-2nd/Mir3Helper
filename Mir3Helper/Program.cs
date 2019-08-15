@@ -116,8 +116,6 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 
 		async Task<double> Update()
 		{
-			m_User.ClearCache();
-			m_Assist.ClearCache();
 			if (m_Assist.Moving || m_Assist.Casting) return 0.1;
 			m_Distance = -1;
 			var now = DateTime.UtcNow;
@@ -132,7 +130,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 			if (!m_Same && !m_Assist.Hiding)
 			{
 				Console.WriteLine("隐身术");
-				m_Assist.Cast(2, m_Assist.Id);
+				m_Assist.CastAssistMagic(2, m_Assist.Id);
 				return DefaultActionDelay;
 			}
 
@@ -141,15 +139,15 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				if (m_User.AllBuffAtkMagic().All(buff => buff < 3))
 				{
 					Console.WriteLine("强震魔法");
-					m_Assist.Cast(9, m_User.Id);
+					m_Assist.CastAssistMagic(9, m_User.Id);
 					return DefaultActionDelay;
 				}
 			}
 
 			if (m_Assist.Hp < m_Assist.MaxHp - 20)
 			{
-				Console.WriteLine($"治愈术 => {m_Assist.Name}");
-				m_Assist.Cast(1, m_Assist.Id);
+				Console.WriteLine($"治愈术");
+				m_Assist.CastAssistMagic(1, m_Assist.Id);
 				return DefaultActionDelay;
 			}
 
@@ -158,21 +156,21 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				if (m_User.BuffDef < 5)
 				{
 					Console.WriteLine("神圣战甲术");
-					m_Assist.Cast(8, m_User.Id);
+					m_Assist.CastAssistMagic(8, m_User.Id);
 					return DefaultActionDelay;
 				}
 
 				if (m_User.AllBuffDefMagic().All(t => t < 5))
 				{
 					Console.WriteLine("幽灵盾");
-					m_Assist.Cast(7, m_User.Id);
+					m_Assist.CastAssistMagic(7, m_User.Id);
 					return DefaultActionDelay;
 				}
 
 				if (!m_Same && m_User.Hp < m_User.MaxHp - 30)
 				{
-					Console.WriteLine($"治愈术 => {m_User.Name}");
-					m_Assist.Cast(1, m_User.Id);
+					Console.WriteLine($"治愈术");
+					m_Assist.CastAssistMagic(1, m_User.Id);
 					return DefaultActionDelay;
 				}
 			}

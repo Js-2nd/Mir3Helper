@@ -35,16 +35,11 @@ namespace Mir3Helper
 			if (!opened) Window.Key(VirtualKey.VK_Q, send);
 		}
 
-		public void Cast(ushort magic, int target = 0)
+		public void CastAssistMagic(ushort magic, int target = 0)
 		{
 			if (magic >= 1 && magic <= 12)
 			{
-				if (target != 0)
-				{
-//					MagicTarget.Set(target);
-					MagicTargetAlt.Set(target);
-				}
-
+				if (target != 0) MagicTarget.Set(target);
 				Window.Key(VirtualKey.VK_F1 - 1 + magic);
 			}
 		}

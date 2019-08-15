@@ -5,34 +5,19 @@ namespace Mir3Helper
 
 	partial class Game
 	{
-		string m_NameCache;
-		int? m_IdCache;
-		Point? m_PosCache;
-
-		public void ClearCache(bool all = false)
-		{
-			if (all)
-			{
-				m_NameCache = null;
-				m_IdCache = null;
-			}
-
-			m_PosCache = null;
-		}
-
-		public string Name => m_NameCache ?? (m_NameCache = Memory.ReadString(0x69DF00, 12));
-		public int Id => m_IdCache ?? (m_IdCache = Memory.Read<int>(0x7A8024)).Value;
+		public string Name => Memory.ReadString(0x69DF00, 12);
+		public int Id => Memory.Read<int>(0x7A8024);
 		public int Hp => Memory.Read<ushort>(0x7A82A2);
-		public int Mp => Memory.Read<ushort>(0x7A82A6);
 		public int MaxHp => Memory.Read<int>(0x7D8054);
+		public int Mp => Memory.Read<ushort>(0x7A82A6);
 		public int MaxMp => Memory.Read<int>(0x7D8058);
-		public Point Pos => m_PosCache ?? (m_PosCache = Memory.Read<POINT>(Module.KingMir3, 0x1141C0)).Value;
+		public Point Pos => Memory.Read<POINT>(Module.KingMir3, 0x1141C0);
 		public bool Moving => Memory.Read<bool>(0x7A82C9);
 		public bool Casting => Memory.Read<bool>(0x7A8298);
 		public bool Hiding => (Memory.Read<byte>(0x7A82B2) & 0x80) != 0;
 		public MemoryValue<int> AttackTarget => Memory.Value(0x7AC638);
 		public MemoryValue<int> MagicTarget => Memory.Value(0x7AC63C);
-		public MemoryValue<int> MagicTargetAlt => Memory.Value(0x7AC640);
+		public MemoryValue<int> AssistTarget => Memory.Value(0x7AC640);
 
 		public int BuffAtk => Memory.Read<int>(0x7D53C8);
 		public int BuffAtkMagic => Memory.Read<int>(0x7D53E0);
