@@ -1,6 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mir3Helper", "Mir3Helper\Mir3Helper.csproj", "{1F694652-2BFB-49E6-8007-3B5F6F68F698}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinForm", "WinForm\WinForm.csproj", "{5C922360-3CDB-4B4D-B23E-79640F74BEEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +17,15 @@ Global
 		{1F694652-2BFB-49E6-8007-3B5F6F68F698}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F694652-2BFB-49E6-8007-3B5F6F68F698}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F694652-2BFB-49E6-8007-3B5F6F68F698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C922360-3CDB-4B4D-B23E-79640F74BEEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C922360-3CDB-4B4D-B23E-79640F74BEEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C922360-3CDB-4B4D-B23E-79640F74BEEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C922360-3CDB-4B4D-B23E-79640F74BEEA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6EA453D4-0B18-47AD-8C0B-D99280290373}
 	EndGlobalSection
 EndGlobal
