@@ -13,4 +13,23 @@ namespace Mir3Helper
 		XBUTTON1 = 0x20,
 		XBUTTON2 = 0x40,
 	}
+
+	public enum CharacterClass : byte
+	{
+		Warrior = 0,
+		Mage = 1,
+		Taoist = 2,
+	}
+
+	public enum Element : byte
+	{
+		None = 0,
+		Fire = 1,
+		Ice = 2,
+		Thunder = 3,
+		Wind = 4,
+		Holy = 5,
+		Dark = 6,
+		Phantom = 7,
+	}
 }
