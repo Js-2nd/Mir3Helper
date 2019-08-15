@@ -49,17 +49,18 @@ namespace Mir3Helper
 		public T Read<T>(string module, uint offset) where T : struct =>
 			Read<T>(Address(module, offset));
 
-		public string ReadString(uint address, int length, bool trimEnd = true)
+		public string ReadString(uint address, int length, bool trim = true)
 		{
 			int count = ReadBuffer(address, length);
-			if (trimEnd)
-				while (count > 0 && m_Buffer[count - 1] == 0)
-					count--;
+			if (trim)
+				for (int i = 0; i < count; i++)
+					if (m_Buffer[i] == 0)
+						count = i;
 			return count > 0 ? s_Encoding.GetString(m_Buffer, 0, count) : string.Empty;
 		}
 
-		public string ReadString(string module, uint offset, int length, bool trimEnd = true) =>
-			ReadString(Address(module, offset), length, trimEnd);
+		public string ReadString(string module, uint offset, int length, bool trim = true) =>
+			ReadString(Address(module, offset), length, trim);
 
 		unsafe int WriteBuffer(uint address, int size)
 		{
