@@ -13,6 +13,8 @@ namespace Mir3Helper
 		public string Map => Memory.ReadString(0x6AD96D, 16);
 		public Point Pos => Memory.Read<Int32Pair>(Module.KingMir3, 0x1141C0);
 		public bool Hiding => (Memory.Read<byte>(0x7A82B2) & 0x80) != 0;
+		public bool GreenPoison => (Memory.Read<byte>(0x7A82B3) & 0x80) != 0;
+		public bool RedPoison => (Memory.Read<byte>(0x7A82B3) & 0x40) != 0;
 		public bool Moving => Memory.Read<bool>(0x7A82C9);
 		public bool Attacking => Memory.Read<bool>(0x7A8299);
 		public bool Casting => Memory.Read<bool>(0x7A8298);

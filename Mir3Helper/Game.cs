@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Mir3Helper
 {
 	using System;
@@ -39,7 +41,7 @@ namespace Mir3Helper
 		{
 			if (magic >= 1 && magic <= 12)
 			{
-				if (target != 0) MagicTarget.Set(target);
+				if (target != 0) AssistTarget.Set(target);
 				Window.Key(VirtualKey.VK_F1 - 1 + magic);
 			}
 		}
@@ -55,7 +57,9 @@ namespace Mir3Helper
 
 		uint UnitAddress(int x, int y) => Memory.Read<uint>((uint) (0x6BACEC + x * 0x78 + y * 0xD98));
 
-		public void Foo(int range = 9)
+		Dictionary<int, uint> dict;
+
+		public void Foo(int range = 10)
 		{
 			for (int x = -range; x <= range; x++)
 			{
@@ -64,10 +68,8 @@ namespace Mir3Helper
 					uint addr = UnitAddress(x, y);
 					if (addr != 0)
 					{
-						var type = Memory.Read<UnitType>(addr);
-						string name = Memory.ReadString(addr + 8, 32);
-						Point pos = Memory.Read<Int16Pair>(addr + 0x1A0);
-						Console.WriteLine($"{pos} => {type} {name}");
+						var unit = new Unit((Memory, addr));
+						Console.WriteLine($"{unit.Address:X8} {unit.Pos} => {unit.Type} {unit.Name} {unit.Hp}/{unit.MaxHp} {unit.Mp}");
 					}
 				}
 			}

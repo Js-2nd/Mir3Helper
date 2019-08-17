@@ -43,4 +43,18 @@ namespace Mir3Helper
 		[FieldOffset(0)] public readonly uint First;
 		[FieldOffset(sizeof(uint))] public readonly uint Second;
 	}
+
+	[StructLayout(LayoutKind.Explicit)]
+	public readonly struct Int64Pair
+	{
+		[FieldOffset(0)] public readonly long First;
+		[FieldOffset(sizeof(long))] public readonly long Second;
+	}
+
+	[StructLayout(LayoutKind.Explicit)]
+	public readonly struct UInt64Pair
+	{
+		[FieldOffset(0)] public readonly ulong First;
+		[FieldOffset(sizeof(ulong))] public readonly ulong Second;
+	}
 }

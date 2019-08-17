@@ -89,6 +89,10 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 						Game game = null;
 						if (TrySetToForeground(ref game)) game.ClickItemAndInventoryAction();
 					}
+					else if (key == VirtualKey.VK_RCONTROL)
+					{
+						m_Assist?.Foo();
+					}
 				}
 				catch (Exception ex)
 				{
@@ -134,7 +138,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				return DefaultActionDelay;
 			}
 
-			if (Distance <= 9)
+			if (Distance <= 9 && m_User.Hp > 0)
 			{
 				if (m_User.AllBuffAtkMagic().All(buff => buff < 3))
 				{
@@ -151,7 +155,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 				return DefaultActionDelay;
 			}
 
-			if (Distance <= 9)
+			if (Distance <= 9 && m_User.Hp > 0)
 			{
 				if (m_User.BuffDef < 5)
 				{
