@@ -30,12 +30,17 @@ namespace Mir3Helper
 			if (m_Buffer.Length < size) m_Buffer = new byte[size];
 		}
 
-		unsafe int ReadBuffer(uint address, int size)
+		int ReadBuffer(uint address, int size)
 		{
 			EnsureBufferSize(size);
+			return ReadBuffer(address, size, m_Buffer);
+		}
+
+		public unsafe int ReadBuffer(uint address, int size, byte[] buffer, int index = 0)
+		{
 			var count = IntPtr.Zero;
-			fixed (void* buffer = m_Buffer)
-				Kernel32.ReadProcessMemory(m_Handle, (void*) address, buffer, (IntPtr) size, &count);
+			fixed (byte* ptr = buffer)
+				Kernel32.ReadProcessMemory(m_Handle, (void*) address, ptr + index, (IntPtr) size, &count);
 			return count.ToInt32();
 		}
 
@@ -66,8 +71,8 @@ namespace Mir3Helper
 		{
 			if (size > m_Buffer.Length) throw new ArgumentOutOfRangeException(nameof(size));
 			var count = IntPtr.Zero;
-			fixed (void* buffer = m_Buffer)
-				Kernel32.WriteProcessMemory(m_Handle, (void*) address, buffer, (IntPtr) size, &count);
+			fixed (byte* ptr = m_Buffer)
+				Kernel32.WriteProcessMemory(m_Handle, (void*) address, ptr, (IntPtr) size, &count);
 			return count.ToInt32();
 		}
 
