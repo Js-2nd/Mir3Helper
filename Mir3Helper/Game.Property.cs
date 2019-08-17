@@ -54,7 +54,7 @@ namespace Mir3Helper
 			yield return BuffDefWind;
 		}
 
-		public CharacterClass Class => (CharacterClass) Memory.Read<byte>(0x7AC4B3);
+		public CharacterClass Class => Memory.Read<CharacterClass>(0x7AC4B3);
 		public int Level => Memory.Read<ushort>(0x7AC451);
 		public ulong Exp => Memory.Read<ulong>(0x7AC438);
 		public ulong MaxExp => Memory.Read<ulong>(0x7AC440);

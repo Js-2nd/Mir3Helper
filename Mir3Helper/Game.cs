@@ -52,5 +52,25 @@ namespace Mir3Helper
 			Window.Click(pos, send);
 			Window.Click(InventoryAction, send);
 		}
+
+		uint UnitAddress(int x, int y) => Memory.Read<uint>((uint) (0x6BACEC + x * 0x78 + y * 0xD98));
+
+		public void Foo(int range = 9)
+		{
+			for (int x = -range; x <= range; x++)
+			{
+				for (int y = -range; y <= range; y++)
+				{
+					uint addr = UnitAddress(x, y);
+					if (addr != 0)
+					{
+						var type = Memory.Read<UnitType>(addr);
+						string name = Memory.ReadString(addr + 8, 32);
+						Point pos = Memory.Read<Int16Pair>(addr + 0x1A0);
+						Console.WriteLine($"{pos} => {type} {name}");
+					}
+				}
+			}
+		}
 	}
 }

@@ -32,4 +32,11 @@ namespace Mir3Helper
 		Dark = 6,
 		Phantom = 7,
 	}
+
+	public enum UnitType
+	{
+		Monster = 0x57AC74,
+		Npc = 0x57B34C,
+		Player = 0x57D644,
+	}
 }
