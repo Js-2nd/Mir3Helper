@@ -14,7 +14,7 @@ namespace Mir3Helper
 		XBUTTON2 = 0x40,
 	}
 
-	public enum CharacterClass : byte
+	public enum PlayerClass : byte
 	{
 		Warrior = 0,
 		Mage = 1,
@@ -32,5 +32,4 @@ namespace Mir3Helper
 		Dark = 6,
 		Phantom = 7,
 	}
-
 }

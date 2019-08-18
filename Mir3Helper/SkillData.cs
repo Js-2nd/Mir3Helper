@@ -10,7 +10,7 @@ namespace Mir3Helper
 
 		public string Name => Memory.ReadString(Address, 12);
 		public Skill Skill => Memory.Read<Skill>(Address + 0x104);
-		public MemoryValue<SkillLock> Lock => Memory.Value(Address + 0x108);
+		public MemoryValue<SkillTargetLock> TargetLock => Memory.Value(Address + 0x108);
 		public MemoryValue<SkillPoison> Poison => Memory.Value(Address + 0x10A);
 		public MemoryValue<SkillAmulet> Amulet => Memory.Value(Address + 0x10B);
 		public MemoryValue<SkillKey> Key => Memory.Value(Address + 0x10C);
@@ -65,10 +65,10 @@ namespace Mir3Helper
 		超强召唤骷髅 = 105,
 	}
 
-	public enum SkillLock : byte
+	public enum SkillTargetLock : byte
 	{
 		None = 0,
-		All = 1,
+		Any = 1,
 		PlayerOnly = 2,
 	}
 

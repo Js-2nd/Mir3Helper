@@ -1,13 +1,14 @@
 namespace Mir3Helper
 {
-	using Tuple = System.ValueTuple<Memory, uint>;
+	using Tuple = System.ValueTuple<Memory, Address>;
 
 	public readonly struct UnitData
 	{
 		public readonly Memory Memory;
-		public readonly uint Address;
-		public UnitData(in Tuple t) => (Memory, Address) = t;
+		public readonly Address Address;
+		UnitData(in Tuple t) => (Memory, Address) = t;
 
+		public bool IsValid => Memory != null && Address.Value != 0;
 		public UnitType Type => Memory.Read<UnitType>(Address);
 		public int Id => Memory.Read<int>(Address + 0x4);
 		public string Name => Memory.ReadString(Address + 0x8, 32);
