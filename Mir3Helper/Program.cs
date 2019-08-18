@@ -9,7 +9,7 @@
 
 	class Program
 	{
-		const string Version = "0.1.0";
+		const string Version = "0.2.0";
 		const double DefaultActionDelay = 1;
 
 		static async Task Main()
@@ -87,11 +87,7 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 					else if (key == VirtualKey.VK_RSHIFT)
 					{
 						Game game = null;
-						if (TrySetToForeground(ref game)) game.ClickItemAndInventoryAction();
-					}
-					else if (key == VirtualKey.VK_RCONTROL)
-					{
-						m_Assist?.Foo();
+						if (TrySetToForeground(ref game)) game.ClickBagAction();
 					}
 				}
 				catch (Exception ex)
@@ -120,6 +116,8 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 
 		async Task<double> Update()
 		{
+			m_Assist?.Update();
+			m_User?.Update();
 			if (m_Assist.Moving || m_Assist.Casting) return 0.1;
 			m_Distance = -1;
 			var now = DateTime.UtcNow;
@@ -134,47 +132,48 @@ F1治愈术 F2隐身术 F7幽灵盾 F8神圣战甲术 F9强震魔法
 			if (!m_Same && !m_Assist.Hiding)
 			{
 				Console.WriteLine("隐身术");
-				m_Assist.CastAssistMagic(2, m_Assist.Id);
+				m_Assist.CastSkill(2, m_Assist.Id);
 				return DefaultActionDelay;
 			}
 
 			if (Distance <= 9 && m_User.Hp > 0)
 			{
-				if (m_User.AllBuffAtkMagic().All(buff => buff < 3))
-				{
-					Console.WriteLine("强震魔法");
-					m_Assist.CastAssistMagic(9, m_User.Id);
-					return DefaultActionDelay;
-				}
+//				if (m_User.AllBuffAtkMagic().All(buff => buff < 3))
+////				if (m_User.BuffAtkThunder < 3)
+//				{
+//					Console.WriteLine("强震魔法");
+//					m_Assist.CastAssistMagic(9, m_User.Id);
+//					return DefaultActionDelay;
+//				}
 			}
 
 			if (m_Assist.Hp < m_Assist.MaxHp - 20)
 			{
 				Console.WriteLine($"治愈术");
-				m_Assist.CastAssistMagic(1, m_Assist.Id);
+				m_Assist.CastSkill(1, m_Assist.Id);
 				return DefaultActionDelay;
 			}
 
 			if (Distance <= 9 && m_User.Hp > 0)
 			{
-				if (m_User.BuffDef < 5)
-				{
-					Console.WriteLine("神圣战甲术");
-					m_Assist.CastAssistMagic(8, m_User.Id);
-					return DefaultActionDelay;
-				}
+//				if (m_User.BuffDef < 5)
+//				{
+//					Console.WriteLine("神圣战甲术");
+//					m_Assist.CastAssistMagic(8, m_User.Id);
+//					return DefaultActionDelay;
+//				}
 
-				if (m_User.AllBuffDefMagic().All(t => t < 5))
-				{
-					Console.WriteLine("幽灵盾");
-					m_Assist.CastAssistMagic(7, m_User.Id);
-					return DefaultActionDelay;
-				}
+//				if (m_User.AllBuffDefMagic().All(t => t < 5))
+//				{
+//					Console.WriteLine("幽灵盾");
+//					m_Assist.CastAssistMagic(7, m_User.Id);
+//					return DefaultActionDelay;
+//				}
 
 				if (!m_Same && m_User.Hp < m_User.MaxHp - 30)
 				{
 					Console.WriteLine($"治愈术");
-					m_Assist.CastAssistMagic(1, m_User.Id);
+					m_Assist.CastSkill(1, m_User.Id);
 					return DefaultActionDelay;
 				}
 			}

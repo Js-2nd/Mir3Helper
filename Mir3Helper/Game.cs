@@ -26,6 +26,59 @@ namespace Mir3Helper
 
 		public void Dispose() => Process.Dispose();
 
+		public void Update()
+		{
+			UpdateUnits();
+			UpdateSkills();
+		}
+
+		public void UpdateUnits(int range = 10)
+		{
+			m_Units.Clear();
+			for (int y = -range; y <= range; y++)
+			for (int x = -range; x <= range; x++)
+			{
+				UnitData unit = (Memory, UnitAddress(x, y));
+				int id = unit.Id;
+				if (id != 0) m_Units[id] = unit.Address;
+			}
+		}
+
+		public UnitData GetUnit(int id) =>
+			m_Units.TryGetValue(id, out var address) ? (Memory, address) : default;
+
+		public void UpdateSkills()
+		{
+			m_Skills.Clear();
+			m_SkillHotKeys.Clear();
+			for (int i = 0, count = SkillCount; i < count; i++)
+			{
+				SkillData skill = (Memory, i);
+				var id = skill.Id;
+				if (id != Skill.None)
+				{
+					m_Skills[id] = i;
+					var hotKey = skill.HotKey;
+					if (hotKey != SkillHotKey.None) m_SkillHotKeys[hotKey] = i;
+				}
+			}
+		}
+
+		public SkillData GetSkill(Skill id) =>
+			m_Skills.TryGetValue(id, out int index) ? (Memory, index) : default;
+
+		public SkillData GetSkill(SkillHotKey hotKey) =>
+			m_SkillHotKeys.TryGetValue(hotKey, out int index) ? (Memory, index) : default;
+
+		public void CastSkill(ushort magic, int target = 0)
+		{
+			if (magic >= 1 && magic <= 12)
+			{
+				if (target != 0) SkillTargetPlayerOnly.Set(target);
+				Window.Key(VirtualKey.VK_F1 - 1 + magic);
+			}
+		}
+
 		public async Task CoupleTeleport(bool send = false)
 		{
 			bool opened = StatusOpened;
@@ -38,45 +91,20 @@ namespace Mir3Helper
 			Window.Key(VirtualKey.VK_Q, send);
 			await Task.Delay(20);
 			Window.DoubleClick(StatusLeftRing, send);
-			if (!opened) Window.Key(VirtualKey.VK_Q, send);
-		}
-
-		public void CastAssistMagic(ushort magic, int target = 0)
-		{
-			if (magic >= 1 && magic <= 12)
+			if (!opened)
 			{
-				if (target != 0) AssistTarget.Set(target);
-				Window.Key(VirtualKey.VK_F1 - 1 + magic);
+				await Task.Delay(20);
+				Window.Key(VirtualKey.VK_Q, send);
 			}
 		}
 
-		public void ClickItemAndInventoryAction(bool send = false)
+		public void ClickBagAction(bool send = false)
 		{
-			if (!InventoryOpened) return;
+			if (!BagOpened) return;
 			GetCursorPos(out var pos);
 			ScreenToClient(Process.MainWindowHandle, ref pos);
 			Window.Click(pos, send);
-			Window.Click(InventoryAction, send);
-		}
-
-		uint UnitAddress(int x, int y) => Memory.Read<uint>((uint) (0x6BACEC + x * 0x78 + y * 0xD98));
-
-		Dictionary<int, uint> dict;
-
-		public void Foo(int range = 10)
-		{
-			for (int x = -range; x <= range; x++)
-			{
-				for (int y = -range; y <= range; y++)
-				{
-					uint addr = UnitAddress(x, y);
-					if (addr != 0)
-					{
-						var unit = new Unit((Memory, addr));
-						Console.WriteLine($"{unit.Address:X8} {unit.Pos} => {unit.Type} {unit.Name} {unit.Hp}/{unit.MaxHp} {unit.Mp}");
-					}
-				}
-			}
+			Window.Click(BagAction, send);
 		}
 	}
 }
