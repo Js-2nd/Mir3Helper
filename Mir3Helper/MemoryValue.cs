@@ -8,8 +8,9 @@ namespace Mir3Helper
 		public readonly Address Address;
 		MemoryValue(in Tuple t) => (Memory, Address) = t;
 
-		public T Value => Memory.Read<T>(Address);
-		public bool Set(in T value) => Memory.Write(Address, value);
+		public bool IsValid => Memory != null && Address.Value != 0;
+		public T Value => IsValid ? Memory.Read<T>(Address) : default;
+		public bool Set(in T value) => IsValid && Memory.Write(Address, value);
 		public override string ToString() => Value.ToString();
 
 		public static implicit operator MemoryValue<T>(in Tuple t) => new MemoryValue<T>(t);

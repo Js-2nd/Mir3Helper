@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-
 namespace Mir3Helper
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.Threading.Tasks;
 	using static PInvoke.User32;
@@ -12,12 +11,17 @@ namespace Mir3Helper
 		public Process Process { get; }
 		public Memory Memory { get; }
 		public Window Window { get; }
+		public Point ScreenCenter { get; }
+		readonly Dictionary<int, Address> m_Units = new Dictionary<int, Address>();
+		readonly Dictionary<Skill, int> m_Skills = new Dictionary<Skill, int>();
+		readonly Dictionary<SkillHotKey, int> m_SkillHotKeys = new Dictionary<SkillHotKey, int>();
 
 		public Game(Process process)
 		{
 			Process = process;
 			Memory = new Memory(process);
 			Window = new Window(process);
+			ScreenCenter = ScreenSize.X == 800 ? (400, 240) : (496, 338);
 		}
 
 		public void Dispose() => Process.Dispose();

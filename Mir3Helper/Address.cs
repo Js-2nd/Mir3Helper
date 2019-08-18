@@ -9,7 +9,6 @@ namespace Mir3Helper
 		public override string ToString() => Value.ToString();
 
 		public static Address operator +(Address a, Address b) => a.Value + b.Value;
-
 		public static implicit operator Address(int value) => new Address(value);
 		public static implicit operator Address(IntPtr value) => value.ToInt32();
 	}

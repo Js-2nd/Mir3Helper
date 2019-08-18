@@ -18,6 +18,7 @@ namespace Mir3Helper
 		public bool RedPoison => Self.RedPoison;
 		public bool Moving => Self.Moving;
 
+		public Point ScreenSize => Memory.Read<Int32Pair>(0x6658D0);
 		public string Map => Memory.ReadString(0x6AD96D, 32);
 		public int SkillCount => Memory.Read<byte>(0x796EB0);
 		public int Level => Memory.Read<ushort>(0x7AC451);
@@ -37,6 +38,7 @@ namespace Mir3Helper
 		public MemoryValue<int> AttackTarget => Memory.Value(0x7AC638);
 		public MemoryValue<int> SkillTarget => Memory.Value(0x7AC63C);
 		public MemoryValue<int> SkillTargetPlayerOnly => Memory.Value(0x7AC640);
+		public MemoryValue<Int32Pair> MousePos => Memory.Value(0x7ADA44);
 		public BuffData Buff => new BuffData(Memory);
 
 		public int AttackElement(Element element)
@@ -53,7 +55,7 @@ namespace Mir3Helper
 			return resist;
 		}
 
-		public int UnitAddress(int x, int y) => Memory[0x6BACEC + x * 0x78 + y * 0xD98];
+		public Address UnitAddress(int x, int y) => Memory[0x6BACEC + x * 0x78 + y * 0xD98];
 
 		public int TotalOpened => Memory.Read<byte>(0x6EF680);
 		public bool StatusOpened => Memory.Read<bool>(0x76F92C);

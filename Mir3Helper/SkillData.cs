@@ -1,26 +1,40 @@
 namespace Mir3Helper
 {
-	using Tuple = System.ValueTuple<Memory, uint>;
+	using Tuple = System.ValueTuple<Memory, int>;
 
 	public readonly struct SkillData
 	{
 		public readonly Memory Memory;
-		public readonly uint Address;
-		public SkillData(in Tuple t) => (Memory, Address) = t;
+		public readonly int Index;
+		public readonly Address Address;
 
+		SkillData(in Tuple t)
+		{
+			(Memory, Index) = t;
+			Address = Memory[0x7D83E0 + Index * 0x110];
+		}
+
+		public bool IsValid => Memory != null && Address.Value != 0;
 		public string Name => Memory.ReadString(Address, 12);
-		public Skill Skill => Memory.Read<Skill>(Address + 0x104);
+		public Skill Id => Memory.Read<Skill>(Address + 0x104);
 		public MemoryValue<SkillTargetLock> TargetLock => Memory.Value(Address + 0x108);
 		public MemoryValue<SkillPoison> Poison => Memory.Value(Address + 0x10A);
 		public MemoryValue<SkillAmulet> Amulet => Memory.Value(Address + 0x10B);
-		public MemoryValue<SkillKey> Key => Memory.Value(Address + 0x10C);
-		public MemoryValue<SkillKeyAlt> KeyAlt => Memory.Value(Address + 0x10D);
+		public SkillHotKey HotKey => Memory.Read<SkillHotKey>(Address + 0x10C);
+		public MemoryValue<SkillHotKeyAlt> HotKeyAlt => Memory.Value(Address + 0x10D);
+
+		public void SetHotKey(SkillHotKey key)
+		{
+			Memory.Write(Address + 0x10C, key);
+			Memory.Write(Memory[0x796B80, Index * 0x67 + 0x4], key);
+		}
 
 		public static implicit operator SkillData(in Tuple t) => new SkillData(t);
 	}
 
 	public enum Skill : byte
 	{
+		None = 0,
 		火球术 = 1,
 		治愈术 = 2,
 		精神力战法 = 4,
@@ -94,7 +108,7 @@ namespace Mir3Helper
 		Any = 9,
 	}
 
-	public enum SkillKey : byte
+	public enum SkillHotKey : byte
 	{
 		None = 0,
 		F1 = 0x31,
@@ -111,7 +125,7 @@ namespace Mir3Helper
 		F12 = 0x43,
 	}
 
-	public enum SkillKeyAlt : byte
+	public enum SkillHotKeyAlt : byte
 	{
 		None = 0,
 		EscF1 = 1,
