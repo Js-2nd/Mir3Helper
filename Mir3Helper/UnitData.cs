@@ -2,11 +2,11 @@ namespace Mir3Helper
 {
 	using Tuple = System.ValueTuple<Memory, uint>;
 
-	public readonly struct Unit
+	public readonly struct UnitData
 	{
 		public readonly Memory Memory;
 		public readonly uint Address;
-		public Unit(in Tuple t) => (Memory, Address) = t;
+		public UnitData(in Tuple t) => (Memory, Address) = t;
 		public UnitType Type => Memory.Read<UnitType>(Address);
 		public int Id => Memory.Read<int>(Address + 0x4);
 		public string Name => Memory.ReadString(Address + 0x8, 32);

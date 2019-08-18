@@ -13,7 +13,7 @@ namespace Mir3Helper
 
 		readonly IntPtr m_Handle;
 		readonly Dictionary<string, uint> m_Modules = new Dictionary<string, uint>();
-		byte[] m_Buffer = new byte[16];
+		byte[] m_Buffer = new byte[32];
 
 		public Memory(Process process)
 		{
@@ -22,8 +22,28 @@ namespace Mir3Helper
 				m_Modules[module.ModuleName.ToLowerInvariant()] = (uint) module.BaseAddress;
 		}
 
-		uint Address(string module, uint offset) => module == Module.None ? offset :
-			m_Modules.TryGetValue(module, out uint address) ? address + offset : 0;
+		public uint this[params uint[] offsets] => this[null, offsets];
+
+		public uint this[Module module, params uint[] offsets]
+		{
+			get
+			{
+				uint address = 0;
+				if (module != null) m_Modules.TryGetValue(module.Name, out address);
+				int count = offsets.Length;
+				if (count > 0)
+				{
+					address += offsets[0];
+					for (int i = 1; i < count; i++)
+					{
+						address = Read<uint>(address);
+						address += offsets[i];
+					}
+				}
+
+				return address;
+			}
+		}
 
 		void EnsureBufferSize(int size)
 		{
@@ -51,9 +71,6 @@ namespace Mir3Helper
 			return Unsafe.As<byte, T>(ref m_Buffer[0]);
 		}
 
-		public T Read<T>(string module, uint offset) where T : struct =>
-			Read<T>(Address(module, offset));
-
 		public string ReadString(uint address, int length, bool trim = true)
 		{
 			int count = ReadBuffer(address, length);
@@ -63,9 +80,6 @@ namespace Mir3Helper
 						count = i;
 			return count > 0 ? s_Encoding.GetString(m_Buffer, 0, count) : string.Empty;
 		}
-
-		public string ReadString(string module, uint offset, int length, bool trim = true) =>
-			ReadString(Address(module, offset), length, trim);
 
 		unsafe int WriteBuffer(uint address, int size)
 		{
@@ -84,9 +98,6 @@ namespace Mir3Helper
 			return WriteBuffer(address, size) == size;
 		}
 
-		public bool Write<T>(string module, uint offset, T value) where T : struct =>
-			Write(Address(module, offset), value);
-
 		public bool WriteString(uint address, string value)
 		{
 			int length = value.Length;
@@ -96,10 +107,6 @@ namespace Mir3Helper
 			return WriteBuffer(address, count) == count;
 		}
 
-		public bool WriteString(string module, uint offset, string value) =>
-			WriteString(Address(module, offset), value);
-
 		public (Memory, uint) Value(uint address) => (this, address);
-		public (Memory, uint) Value(string module, uint offset) => (this, Address(module, offset));
 	}
 }

@@ -1,8 +1,11 @@
 namespace Mir3Helper
 {
-	public static class Module
+	public sealed class Module
 	{
-		public const string None = null;
-		public const string KingMir3 = "kingmir3.dll";
+		public static readonly Module KingMir3 = new Module("KingMir3.dll");
+
+		public string Name { get; }
+		Module(string name) => Name = name.ToLowerInvariant();
+		public override string ToString() => Name;
 	}
 }
