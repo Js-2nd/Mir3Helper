@@ -6,8 +6,7 @@ namespace Mir3Helper
 	{
 		public readonly Memory Memory;
 		public readonly uint Address;
-
-		MemoryValue(in Tuple t) => (Memory, Address) = t;
+		public MemoryValue(in Tuple t) => (Memory, Address) = t;
 
 		public T Value => this;
 		public bool Set(T value) => Memory.Write(Address, value);

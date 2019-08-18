@@ -9,15 +9,17 @@ namespace Mir3Helper
 		public SkillData(in Tuple t) => (Memory, Address) = t;
 
 		public string Name => Memory.ReadString(Address, 12);
-		public SkillId Id => Memory.Read<SkillId>(Address + 0x104);
-		public MemoryValue<SkillLockType> Lock => Memory.Value(Address + 0x108);
-		public MemoryValue<SkillPoisonType> Poison => Memory.Value(Address + 0x10A);
-		public MemoryValue<SkillAmuletType> Amulet => Memory.Value(Address + 0x10B);
-		public MemoryValue<SkillHotKey> HotKey => Memory.Value(Address + 0x10C);
-		public MemoryValue<SkillHotKeyAlt> HotKeyAlt => Memory.Value(Address + 0x10D);
+		public Skill Skill => Memory.Read<Skill>(Address + 0x104);
+		public MemoryValue<SkillLock> Lock => Memory.Value(Address + 0x108);
+		public MemoryValue<SkillPoison> Poison => Memory.Value(Address + 0x10A);
+		public MemoryValue<SkillAmulet> Amulet => Memory.Value(Address + 0x10B);
+		public MemoryValue<SkillKey> Key => Memory.Value(Address + 0x10C);
+		public MemoryValue<SkillKeyAlt> KeyAlt => Memory.Value(Address + 0x10D);
+
+		public static implicit operator SkillData(in Tuple t) => new SkillData(t);
 	}
 
-	public enum SkillId : byte
+	public enum Skill : byte
 	{
 		火球术 = 1,
 		治愈术 = 2,
@@ -63,14 +65,14 @@ namespace Mir3Helper
 		超强召唤骷髅 = 105,
 	}
 
-	public enum SkillLockType : byte
+	public enum SkillLock : byte
 	{
 		None = 0,
 		All = 1,
 		PlayerOnly = 2,
 	}
 
-	public enum SkillPoisonType : byte
+	public enum SkillPoison : byte
 	{
 		None = 0,
 		Alternately = 1,
@@ -78,7 +80,7 @@ namespace Mir3Helper
 		Green = 3,
 	}
 
-	public enum SkillAmuletType : byte
+	public enum SkillAmulet : byte
 	{
 		None = 0,
 		Normal = 1,
@@ -92,7 +94,7 @@ namespace Mir3Helper
 		Any = 9,
 	}
 
-	public enum SkillHotKey : byte
+	public enum SkillKey : byte
 	{
 		None = 0,
 		F1 = 0x31,
@@ -109,7 +111,7 @@ namespace Mir3Helper
 		F12 = 0x43,
 	}
 
-	public enum SkillHotKeyAlt : byte
+	public enum SkillKeyAlt : byte
 	{
 		None = 0,
 		EscF1 = 1,
