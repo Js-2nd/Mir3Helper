@@ -11,6 +11,8 @@ namespace Mir3Helper
 		Point(in Tuple t) => (X, Y) = t;
 
 		public IntPtr ToLParam() => (IntPtr) ((X & 0xFFFF) | (Y << 16));
+		public Int16Pair ToInt16Pair() => new Int16Pair((short) X, (short) Y);
+		public Int32Pair ToInt32Pair() => new Int32Pair(X, Y);
 		public override string ToString() => $"({X.ToString()}, {Y.ToString()})";
 
 		public static Point operator -(in Point p) => (-p.X, -p.Y);

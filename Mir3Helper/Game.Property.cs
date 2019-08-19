@@ -2,9 +2,12 @@ namespace Mir3Helper
 {
 	partial class Game
 	{
+		int? m_Id;
+		string m_Name;
+
 		public UnitData Self => Memory.Value(0x7A8020);
-		public int Id => Self.Id;
-		public string Name => Self.Name;
+		public int Id => m_Id ?? (m_Id = Self.Id).Value;
+		public string Name => m_Name ?? (m_Name = Self.Name);
 		public Point Pos => Self.Pos;
 		public bool Casting => Self.Casting;
 		public bool Attacking => Self.Attacking;
@@ -19,6 +22,7 @@ namespace Mir3Helper
 		public bool Moving => Self.Moving;
 
 		public Point ScreenSize => Memory.Read<Int32Pair>(0x6658D0);
+		public Point SelfScreenPos => ScreenSize.X == 800 ? (400, 240) : (496, 338);
 		public string Map => Memory.ReadString(0x6AD96D, 32);
 		public int SkillCount => Memory.Read<byte>(0x796EB0);
 		public int Level => Memory.Read<ushort>(0x7AC451);

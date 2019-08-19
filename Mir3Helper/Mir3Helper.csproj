@@ -99,6 +99,7 @@
     <Compile Include="Module.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Program.Update.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="IntPair.cs" />

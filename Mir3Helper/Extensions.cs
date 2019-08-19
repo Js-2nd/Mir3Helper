@@ -1,14 +1,9 @@
 namespace Mir3Helper
 {
-	using System;
-	using System.Threading.Tasks;
 	using static PInvoke.User32;
 
 	public static class Extensions
 	{
-		public static void Catch(this Task task) =>
-			task.ContinueWith(t => Console.Error.WriteLine(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
-
 		public static bool Bit(this byte value, byte bit) => (value & (1 << bit)) != 0;
 
 		public static VirtualKey ToVirtualKey(this SkillHotKey hotKey)

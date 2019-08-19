@@ -19,46 +19,77 @@ namespace Mir3Helper
 
 		readonly int[] m_KeyCounter;
 		readonly Channel<int> m_Channel;
-		readonly WindowsHookDelegate m_HookProc;
 		int m_HookThreadId;
+		WindowsHookDelegate m_HookProc;
 		SafeHookHandle m_Hook;
 
 		public InputSystem()
 		{
 			m_KeyCounter = new int[256];
 			m_Channel = Channel.CreateUnbounded<int>(new UnboundedChannelOptions {SingleReader = true});
-			m_HookProc = LowLevelKeyboardProc;
-			Task.Run(ReaderLoop).Catch();
-			Task.Factory.StartNew(HookKeyboard, TaskCreationOptions.LongRunning).Catch();
+			Task.Run(ReaderLoop);
+			Task.Factory.StartNew(HookKeyboard, TaskCreationOptions.LongRunning);
 		}
 
 		async Task ReaderLoop()
 		{
-			while (await m_Channel.Reader.WaitToReadAsync())
-			while (m_Channel.Reader.TryRead(out int key))
+			try
 			{
-				if (key < 0)
+				while (await m_Channel.Reader.WaitToReadAsync())
+				while (m_Channel.Reader.TryRead(out int key))
 				{
-					key = ~key;
-					m_KeyCounter[key] = 0;
-					KeyUp?.Invoke((VirtualKey) key);
+					if (key < 0)
+					{
+						key = ~key;
+						m_KeyCounter[key] = 0;
+						Trigger(KeyUp, key);
+					}
+					else
+					{
+						if (++m_KeyCounter[key] == 1) Trigger(KeyDown, key);
+						Trigger(KeyHold, key);
+					}
 				}
-				else
-				{
-					if (++m_KeyCounter[key] == 1) KeyDown?.Invoke((VirtualKey) key);
-					KeyHold?.Invoke((VirtualKey) key);
-				}
+			}
+			catch (Exception ex)
+			{
+				Console.Error.WriteLine(ex);
+			}
+			finally
+			{
+				Dispose();
+			}
+		}
+
+		void Trigger(Action<VirtualKey> action, int key)
+		{
+			try
+			{
+				action?.Invoke((VirtualKey) key);
+			}
+			catch (Exception ex)
+			{
+				Console.Error.WriteLine(ex);
 			}
 		}
 
 		void HookKeyboard()
 		{
-			m_HookThreadId = Kernel32.GetCurrentThreadId();
-			m_Hook = SetWindowsHookEx(WindowsHookType.WH_KEYBOARD_LL, m_HookProc, IntPtr.Zero, 0);
-			Console.WriteLine($"[InputSystem] HookKeyboard {m_Hook.DangerousGetHandle() != IntPtr.Zero}");
-			MessageLoop();
-			Console.WriteLine($"[InputSystem] MessageLoop end");
-			Dispose();
+			try
+			{
+				m_HookThreadId = Kernel32.GetCurrentThreadId();
+				m_HookProc = LowLevelKeyboardProc;
+				m_Hook = SetWindowsHookEx(WindowsHookType.WH_KEYBOARD_LL, m_HookProc, IntPtr.Zero, 0);
+				MessageLoop();
+			}
+			catch (Exception ex)
+			{
+				Console.Error.WriteLine(ex);
+			}
+			finally
+			{
+				Dispose();
+			}
 		}
 
 		int LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam)
@@ -114,7 +145,8 @@ namespace Mir3Helper
 		public IObservable<VirtualKey> ObserveKeyUp() =>
 			Observable.FromEvent<VirtualKey>(h => KeyUp += h, h => KeyUp -= h);
 
-		public Task<VirtualKey> GetKeyDown() => ObserveKeyDown().FirstOrDefaultAsync().ToTask();
+		public Task<VirtualKey> GetKeyDown() =>
+			ObserveKeyDown().FirstOrDefaultAsync().ToTask();
 
 		public Task<VirtualKey> GetKeyDown(VirtualKey key) =>
 			ObserveKeyDown().FirstOrDefaultAsync(input => input == key).ToTask();
