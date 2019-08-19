@@ -39,6 +39,7 @@ namespace Mir3Helper
 		public int Dexterity => Memory.Read<byte>(0x7AC4AE);
 		public PlayerClass Class => Memory.Read<PlayerClass>(0x7AC4B3);
 		public int Gold => Memory.Read<int>(0x7AC4B4);
+		public MemoryValue<int> EscKeyTime => Memory.Value(0x66AB14);
 		public MemoryValue<int> AttackTarget => Memory.Value(0x7AC638);
 		public MemoryValue<int> SkillTarget => Memory.Value(0x7AC63C);
 		public MemoryValue<int> SkillTargetPlayerOnly => Memory.Value(0x7AC640);
@@ -59,7 +60,7 @@ namespace Mir3Helper
 			return resist;
 		}
 
-		public Address UnitAddress(int x, int y) => Memory[0x6BACEC + x * 0x78 + y * 0xD98];
+		public Address UnitAddress(int x, int y) => Memory[0x6BACEC + x * 0x78 + y * 0xD98, 0];
 
 		public int TotalOpened => Memory.Read<byte>(0x6EF680);
 		public bool StatusOpened => Memory.Read<bool>(0x76F92C);

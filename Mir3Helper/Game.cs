@@ -65,6 +65,13 @@ namespace Mir3Helper
 			return m_Units.TryGetValue(id, out var address) ? (Memory, address) : default;
 		}
 
+		public IEnumerable<UnitData> GetUnits()
+		{
+			UpdateUnits();
+			foreach (var address in m_Units.Values)
+				yield return (Memory, address);
+		}
+
 		void UpdateUnits(int range = 8)
 		{
 			if (m_UnitsCached) return;
@@ -83,19 +90,19 @@ namespace Mir3Helper
 		public SkillData GetSkill(Skill id)
 		{
 			UpdateSkills();
-			return m_Skills.TryGetValue(id, out int index) ? (Memory, index) : default;
+			return m_Skills.TryGetValue(id, out int index) ? (Memory, index) : default(SkillData);
 		}
 
 		public SkillData GetSkill(SkillKey key)
 		{
 			UpdateSkills();
-			return m_SkillKeys.TryGetValue(key, out int index) ? (Memory, index) : default;
+			return m_SkillKeys.TryGetValue(key, out int index) ? (Memory, index) : default(SkillData);
 		}
 
 		public SkillData GetSkill(SkillEscKey escKey)
 		{
 			UpdateSkills();
-			return m_SkillEscKeys.TryGetValue(escKey, out int index) ? (Memory, index) : default;
+			return m_SkillEscKeys.TryGetValue(escKey, out int index) ? (Memory, index) : default(SkillData);
 		}
 
 		void UpdateSkills()
@@ -123,21 +130,45 @@ namespace Mir3Helper
 			}
 		}
 
-		public async ValueTask<bool> TryCastSkill(Skill id, int target = 0)
+		public bool ChangeSkillKey(Skill id, SkillKey key)
 		{
 			var skill = GetSkill(id);
 			if (!skill.IsValid) return false;
+			var oldSkill = GetSkill(key);
+			if (oldSkill.IsValid) oldSkill.SetKey(SkillKey.None);
+			var oldKey = skill.Key;
+			if (oldKey != SkillKey.None) m_SkillKeys.Remove(oldKey);
+			skill.SetKey(key);
+			m_SkillKeys[key] = skill.Index;
+			return true;
+		}
+
+		public bool ChangeSkillEscKey(Skill id, SkillEscKey escKey)
+		{
+			var skill = GetSkill(id);
+			if (!skill.IsValid) return false;
+			var oldSkill = GetSkill(escKey);
+			if (oldSkill.IsValid) oldSkill.EscKey.Set(SkillEscKey.None);
+			var oldEscKey = skill.EscKey.Value;
+			if (oldEscKey != SkillEscKey.None) m_SkillEscKeys.Remove(oldEscKey);
+			skill.EscKey.Set(escKey);
+			m_SkillEscKeys[escKey] = skill.Index;
+			return true;
+		}
+
+		public bool TryCastSkill(Skill id, int target = 0)
+		{
+			var skill = GetSkill(id);
+			if (!skill.IsValid) return false;
+			MousePos.Set(SelfScreenPos.ToInt32Pair());
 			var key = skill.Key;
 			if (key != SkillKey.None) Window.Key(key.ToVirtualKey());
 			else
 			{
 				var escKey = skill.EscKey.Value;
-				if (escKey == SkillEscKey.None) skill.EscKey.Set(escKey = SkillEscKey.F12);
-				Window.Key(VirtualKey.VK_ESCAPE);
-				await Task.Delay(20);
+				if (escKey == SkillEscKey.None) ChangeSkillEscKey(id, escKey = SkillEscKey.F12);
+				EscKeyTime.Set(Environment.TickCount - 500);
 				Window.Key(escKey.ToVirtualKey());
-				await Task.Delay(20);
-				if (escKey == SkillEscKey.F12) skill.EscKey.Set(SkillEscKey.None);
 			}
 
 			return true;
