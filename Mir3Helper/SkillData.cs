@@ -20,10 +20,10 @@ namespace Mir3Helper
 		public MemoryValue<SkillTargetLock> TargetLock => Memory.Value(Address + 0x108);
 		public MemoryValue<SkillPoison> Poison => Memory.Value(Address + 0x10A);
 		public MemoryValue<SkillAmulet> Amulet => Memory.Value(Address + 0x10B);
-		public SkillHotKey HotKey => Memory.Read<SkillHotKey>(Address + 0x10C);
-		public MemoryValue<SkillHotKeyAlt> HotKeyAlt => Memory.Value(Address + 0x10D);
+		public SkillKey Key => Memory.Read<SkillKey>(Address + 0x10C);
+		public MemoryValue<SkillEscKey> EscKey => Memory.Value(Address + 0x10D);
 
-		public void SetHotKey(SkillHotKey key)
+		public void SetKey(SkillKey key)
 		{
 			Memory.Write(Address + 0x10C, key);
 			Memory.Write(Memory[0x796B80, Index * 0x67 + 0x4], key);
@@ -108,7 +108,7 @@ namespace Mir3Helper
 		Any = 9,
 	}
 
-	public enum SkillHotKey : byte
+	public enum SkillKey : byte
 	{
 		None = 0,
 		F1 = 0x31,
@@ -125,20 +125,20 @@ namespace Mir3Helper
 		F12 = 0x43,
 	}
 
-	public enum SkillHotKeyAlt : byte
+	public enum SkillEscKey : byte
 	{
 		None = 0,
-		EscF1 = 1,
-		EscF2 = 2,
-		EscF3 = 3,
-		EscF4 = 4,
-		EscF5 = 5,
-		EscF6 = 6,
-		EscF7 = 7,
-		EscF8 = 8,
-		EscF9 = 9,
-		EscF10 = 10,
-		EscF11 = 11,
-		EscF12 = 12,
+		F1 = 1,
+		F2 = 2,
+		F3 = 3,
+		F4 = 4,
+		F5 = 5,
+		F6 = 6,
+		F7 = 7,
+		F8 = 8,
+		F9 = 9,
+		F10 = 10,
+		F11 = 11,
+		F12 = 12,
 	}
 }

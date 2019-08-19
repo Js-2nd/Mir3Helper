@@ -5,174 +5,93 @@
 	using System.IO;
 	using System.Linq;
 	using System.Threading.Tasks;
-	using static PInvoke.User32;
 
-	public sealed partial class Program
+	partial class Program
 	{
-		public const string Version = "0.2.0";
-		const double DefaultActionDelay = 1;
-
-		static async Task Main()
-		{
-			Console.SetError(new StreamWriter("error.txt", true) {AutoFlush = true});
-			AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
-				Console.Error.WriteLine(args.ExceptionObject);
-			await new Program().Start();
-		}
-
-		Game m_User;
-		Game m_Assist;
-		bool m_Valid;
-		bool m_Same;
-		bool m_Running;
-		int m_Distance;
-		DateTime m_TeleportTime;
-
-		async Task Start()
-		{
-			Console.WriteLine($"Mir3Helper v{Version}");
-			Task.Run(HandleInput).Catch();
-			while (true)
-			{
-				try
-				{
-					if (m_Valid && m_Running) await Task.Delay(TimeSpan.FromSeconds(await Update()));
-					else await Task.Delay(100);
-				}
-				catch (Exception ex)
-				{
-					Console.Error.WriteLine(ex);
-				}
-			}
-		}
-
-		async Task HandleInput()
-		{
-			using var input = new InputSystem();
-			while (true)
-			{
-				try
-				{
-					var key = await input.GetKeyDown();
-					if (key == VirtualKey.VK_PRIOR)
-					{
-						TrySetToForeground(ref m_User);
-						if (m_User != null) Console.WriteLine($"玩家角色 => {m_User.Name}");
-					}
-					else if (key == VirtualKey.VK_NEXT)
-					{
-						TrySetToForeground(ref m_Assist);
-						if (m_Assist != null) Console.WriteLine($"辅助角色 => {m_Assist.Name}");
-					}
-					else if (key == VirtualKey.VK_END)
-					{
-						m_Running = !m_Running;
-						Console.WriteLine(m_Running ? "Run" : "Pause");
-					}
-					else if (key == VirtualKey.VK_OEM_3)
-					{
-						if (m_Assist != null) await m_Assist.CoupleTeleport();
-					}
-					else if (key == VirtualKey.VK_RSHIFT)
-					{
-						Game game = null;
-						if (TrySetToForeground(ref game)) game.ClickBagAction();
-					}
-				}
-				catch (Exception ex)
-				{
-					Console.Error.WriteLine(ex);
-				}
-			}
-		}
-
-		bool TrySetToForeground(ref Game game)
-		{
-			int pid = GetForegroundProcessId();
-			var process = Process.GetProcessById(pid);
-			if (process.ProcessName.ToLowerInvariant() != "mir3" || game?.Process.Id == process.Id) return false;
-			game = new Game(process);
-			m_Valid = m_User != null && m_Assist != null;
-			m_Same = m_User?.Process.Id == m_Assist?.Process.Id;
-			return true;
-		}
-
-		int GetForegroundProcessId()
-		{
-			var window = GetForegroundWindow();
-			GetWindowThreadProcessId(window, out int processId);
-			return processId;
-		}
+		DateTime m_WarpTime;
+		DateTime m_HideTime;
+		DateTime m_HealTime;
 
 		async Task<double> Update()
 		{
-			m_Assist?.Update();
-			m_User?.Update();
 			if (m_Assist.Moving || m_Assist.Casting) return 0.1;
-			m_Distance = -1;
+			m_Assist.Update();
+			int distance = 0;
+			if (m_HasUser)
+			{
+				m_User.Update();
+				var delta = m_User.Pos - m_Assist.Pos;
+				distance = Math.Max(Math.Abs(delta.X), Math.Abs(delta.Y));
+			}
+
 			var now = DateTime.UtcNow;
-			if (now >= m_TeleportTime && Distance >= 5)
+			if (m_HasUser && now >= m_WarpTime && distance > 2)
 			{
-				Console.WriteLine("夫妻传送");
-				await m_Assist.CoupleTeleport();
-				m_TeleportTime = now + TimeSpan.FromSeconds(3.5);
-				return 2.5;
+				await m_Assist.CoupleWarp();
+				m_WarpTime = now + TimeSpan.FromSeconds(3.5);
+				return 2;
 			}
 
-			if (!m_Same && !m_Assist.Hiding)
+			if (now >= m_HideTime && !m_Assist.Hiding)
 			{
-				Console.WriteLine("隐身术");
-				m_Assist.CastSkill(2, m_Assist.Id);
-				return DefaultActionDelay;
+				m_Assist.TryCastSkill(2, m_Assist.Id);
+				m_HideTime = now + TimeSpan.FromSeconds(m_HasUser ? 5 : 15);
+				return 1;
 			}
 
-			if (Distance <= 9 && m_User.Hp > 0)
+
+			var heal = m_Assist.GetSkill(Skill.治愈术);
+			if (heal.IsValid)
 			{
-//				if (m_User.AllBuffAtkMagic().All(buff => buff < 3))
-////				if (m_User.BuffAtkThunder < 3)
-//				{
-//					Console.WriteLine("强震魔法");
-//					m_Assist.CastAssistMagic(9, m_User.Id);
-//					return DefaultActionDelay;
-//				}
+				m_Assist.TryCastSkill(heal, m_Assist.Id);
+			}
+
+			int deltaHp = m_Assist.MaxHp - m_Assist.Hp;
+			if (deltaHp >= 50)
+			{
+			}
+			else if (now >= m_HealTime && deltaHp >= 20)
+			{
 			}
 
 			if (m_Assist.Hp < m_Assist.MaxHp - 20)
 			{
-				Console.WriteLine($"治愈术");
-				m_Assist.CastSkill(1, m_Assist.Id);
+				m_Assist.TryCastSkill(1, m_Assist.Id);
 				return DefaultActionDelay;
+			}
+
+			if (m_HasUser && distance < 9 && m_User.Hp > 0)
+			{
+//				if (m_User.AllBuffAtkMagic().All(buff => buff < 3))
+////				if (m_User.BuffAtkThunder < 3)
+//				{
+//					m_Assist.CastAssistMagic(9, m_User.Id);
+//					return DefaultActionDelay;
+//				}
 			}
 
 			if (Distance <= 9 && m_User.Hp > 0)
 			{
 //				if (m_User.BuffDef < 5)
 //				{
-//					Console.WriteLine("神圣战甲术");
 //					m_Assist.CastAssistMagic(8, m_User.Id);
 //					return DefaultActionDelay;
 //				}
 
 //				if (m_User.AllBuffDefMagic().All(t => t < 5))
 //				{
-//					Console.WriteLine("幽灵盾");
 //					m_Assist.CastAssistMagic(7, m_User.Id);
 //					return DefaultActionDelay;
 //				}
 
 				if (!m_Same && m_User.Hp < m_User.MaxHp - 30)
 				{
-					Console.WriteLine($"治愈术");
-					m_Assist.CastSkill(1, m_User.Id);
+					m_Assist.TryCastSkill(1, m_User.Id);
 					return DefaultActionDelay;
 				}
 			}
 
 			return 0.5;
 		}
-
-		int Distance => m_Same ? 0 :
-			m_Distance >= 0 ? m_Distance :
-			m_Distance = Point.ManhattanDistance(m_User.Pos, m_Assist.Pos);
 	}
 }

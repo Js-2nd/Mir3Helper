@@ -36,7 +36,8 @@ namespace Mir3Helper
 		Dictionary<int, Address> m_Units;
 		bool m_SkillsCached;
 		Dictionary<Skill, int> m_Skills;
-		Dictionary<SkillHotKey, int> m_SkillHotKeys;
+		Dictionary<SkillKey, int> m_SkillKeys;
+		Dictionary<SkillEscKey, int> m_SkillEscKeys;
 
 		public void Update()
 		{
@@ -85,10 +86,16 @@ namespace Mir3Helper
 			return m_Skills.TryGetValue(id, out int index) ? (Memory, index) : default;
 		}
 
-		public SkillData GetSkill(SkillHotKey hotKey)
+		public SkillData GetSkill(SkillKey key)
 		{
 			UpdateSkills();
-			return m_SkillHotKeys.TryGetValue(hotKey, out int index) ? (Memory, index) : default;
+			return m_SkillKeys.TryGetValue(key, out int index) ? (Memory, index) : default;
+		}
+
+		public SkillData GetSkill(SkillEscKey escKey)
+		{
+			UpdateSkills();
+			return m_SkillEscKeys.TryGetValue(escKey, out int index) ? (Memory, index) : default;
 		}
 
 		void UpdateSkills()
@@ -97,8 +104,10 @@ namespace Mir3Helper
 			m_SkillsCached = true;
 			if (m_Skills != null) m_Skills.Clear();
 			else m_Skills = new Dictionary<Skill, int>();
-			if (m_SkillHotKeys != null) m_SkillHotKeys.Clear();
-			else m_SkillHotKeys = new Dictionary<SkillHotKey, int>();
+			if (m_SkillKeys != null) m_SkillKeys.Clear();
+			else m_SkillKeys = new Dictionary<SkillKey, int>();
+			if (m_SkillEscKeys != null) m_SkillEscKeys.Clear();
+			else m_SkillEscKeys = new Dictionary<SkillEscKey, int>();
 			for (int i = 0, count = SkillCount; i < count; i++)
 			{
 				SkillData skill = (Memory, i);
@@ -106,19 +115,32 @@ namespace Mir3Helper
 				if (id != Skill.None)
 				{
 					m_Skills[id] = i;
-					var hotKey = skill.HotKey;
-					if (hotKey != SkillHotKey.None) m_SkillHotKeys[hotKey] = i;
+					var key = skill.Key;
+					if (key != SkillKey.None) m_SkillKeys[key] = i;
+					var escKey = skill.EscKey.Value;
+					if (escKey != SkillEscKey.None) m_SkillEscKeys[escKey] = i;
 				}
 			}
 		}
 
-		public void CastSkill(ushort magic, int target = 0)
+		public async ValueTask<bool> TryCastSkill(Skill id, int target = 0)
 		{
-			if (magic >= 1 && magic <= 12)
+			var skill = GetSkill(id);
+			if (!skill.IsValid) return false;
+			var key = skill.Key;
+			if (key != SkillKey.None) Window.Key(key.ToVirtualKey());
+			else
 			{
-				if (target != 0) SkillTargetPlayerOnly.Set(target);
-				Window.Key(VirtualKey.VK_F1 - 1 + magic);
+				var escKey = skill.EscKey.Value;
+				if (escKey == SkillEscKey.None) skill.EscKey.Set(escKey = SkillEscKey.F12);
+				Window.Key(VirtualKey.VK_ESCAPE);
+				await Task.Delay(20);
+				Window.Key(escKey.ToVirtualKey());
+				await Task.Delay(20);
+				if (escKey == SkillEscKey.F12) skill.EscKey.Set(SkillEscKey.None);
 			}
+
+			return true;
 		}
 
 		public bool CoupleWarping { get; private set; }

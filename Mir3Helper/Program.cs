@@ -20,6 +20,9 @@
 
 		InputSystem m_Input;
 		bool m_Running;
+		bool m_HasUser;
+		Game m_User;
+		Game m_Assist;
 		Game m_Temp;
 
 		async Task Start()
@@ -30,6 +33,8 @@
 			{
 				try
 				{
+					CheckExit(ref m_User);
+					CheckExit(ref m_Assist);
 					if (!m_Running || m_Assist == null) await Task.Delay(100);
 					else await Task.Delay(TimeSpan.FromSeconds(await Update()));
 				}
@@ -44,11 +49,19 @@
 		{
 			if (key == VirtualKey.VK_PRIOR)
 			{
-				if (Game.GetForeground(ref m_User) >= 0) Console.WriteLine($"User => {m_User.Name}");
+				if (Game.GetForeground(ref m_User) >= 0)
+				{
+					OnGameChange();
+					Console.WriteLine($"User => {m_User.Name}");
+				}
 			}
 			else if (key == VirtualKey.VK_NEXT)
 			{
-				if (Game.GetForeground(ref m_Assist) >= 0) Console.WriteLine($"Assist => {m_Assist.Name}");
+				if (Game.GetForeground(ref m_Assist) >= 0)
+				{
+					OnGameChange();
+					Console.WriteLine($"Assist => {m_Assist.Name}");
+				}
 			}
 			else if (key == VirtualKey.VK_END)
 			{
@@ -62,11 +75,28 @@
 					Console.WriteLine(m_Running ? "Run" : "Pause");
 				}
 			}
-			else if (key == VirtualKey.VK_OEM_3) m_Assist?.CoupleWarp();
+			else if (key == VirtualKey.VK_OEM_3)
+			{
+				m_Assist?.CoupleWarp();
+			}
 			else if (key == VirtualKey.VK_RCONTROL)
 			{
 				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.ClickWithBagAction();
 			}
+		}
+
+		void CheckExit(ref Game game)
+		{
+			if (game != null && game.Process.HasExited)
+			{
+				game = null;
+				OnGameChange();
+			}
+		}
+
+		void OnGameChange()
+		{
+			m_HasUser = m_User != null && m_Assist != null && m_User.Process.Id != m_Assist.Process.Id;
 		}
 	}
 }
