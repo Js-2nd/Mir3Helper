@@ -29,6 +29,12 @@
 		{
 			m_Input = new InputSystem();
 			m_Input.KeyDown += HandleInput;
+			Console.WriteLine("[PageUp] Set User");
+			Console.WriteLine("[PageDown] Set Assist");
+			Console.WriteLine("[End] Run / Pause");
+			Console.WriteLine("[`] Assist CoupleWarp");
+			Console.WriteLine("[RightControl] ClickItemWithBagAction");
+			Console.WriteLine("[Shift+X] ClickItemWithSendMail");
 			while (true)
 			{
 				try
