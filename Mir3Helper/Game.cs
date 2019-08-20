@@ -158,23 +158,26 @@ namespace Mir3Helper
 		}
 
 		public bool TryCastSkill(Skill skillId, int targetId = 0,
+			SkillPoison poison = SkillPoison.None, SkillAmulet amulet = SkillAmulet.None) =>
+			TryCastSkill(skillId, targetId == 0 ? Self : GetUnit(targetId), poison, amulet);
+
+		public bool TryCastSkill(Skill skillId, in UnitData target,
 			SkillPoison poison = SkillPoison.None, SkillAmulet amulet = SkillAmulet.None)
 		{
+			if (!target.IsValid) return false;
 			var skill = GetSkill(skillId);
 			if (!skill.IsValid) return false;
-			if (targetId == 0) targetId = Id;
-			var target = GetUnit(targetId);
-			if (!target.IsValid) return false;
+			Console.WriteLine($"{skillId} => {target.Name}");
 			switch (skill.TargetLock.Value)
 			{
 				case SkillTargetLock.None:
 					MousePos.Set(MapPosToScreenPos(target.Pos).ToInt32Pair());
 					break;
 				case SkillTargetLock.Any:
-					SkillTarget.Set(targetId);
+					SkillTarget.Set(target.Id);
 					break;
 				case SkillTargetLock.PlayerOnly:
-					SkillTargetPlayerOnly.Set(targetId);
+					SkillTargetPlayerOnly.Set(target.Id);
 					break;
 			}
 

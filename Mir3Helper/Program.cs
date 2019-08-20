@@ -33,8 +33,17 @@
 			{
 				try
 				{
-					CheckExit(ref m_User);
-					CheckExit(ref m_Assist);
+					if (CheckExit(ref m_User)) Console.WriteLine("User exited");
+					if (CheckExit(ref m_Assist))
+					{
+						Console.WriteLine("Assist exited");
+						if (m_Running)
+						{
+							m_Running = false;
+							Console.WriteLine("Pause");
+						}
+					}
+
 					await Task.Delay(TimeSpan.FromSeconds(m_Running && m_Assist != null ? await Update() : 0.1));
 				}
 				catch (Exception ex)
@@ -50,6 +59,7 @@
 			{
 				if (Game.GetForeground(ref m_User) >= 0)
 				{
+					m_User.Update();
 					OnGameChange();
 					Console.WriteLine($"User => {m_User.Name}");
 				}
@@ -58,6 +68,7 @@
 			{
 				if (Game.GetForeground(ref m_Assist) >= 0)
 				{
+					m_Assist.Update();
 					OnGameChange();
 					Console.WriteLine($"Assist => {m_Assist.Name}");
 				}
@@ -84,13 +95,12 @@
 			}
 		}
 
-		void CheckExit(ref Game game)
+		bool CheckExit(ref Game game)
 		{
-			if (game != null && game.Process.HasExited)
-			{
-				game = null;
-				OnGameChange();
-			}
+			if (game == null || !game.Process.HasExited) return false;
+			game = null;
+			OnGameChange();
+			return true;
 		}
 
 		void OnGameChange()

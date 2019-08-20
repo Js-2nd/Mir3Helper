@@ -21,7 +21,7 @@
 			{
 				m_User.Update();
 				dist = (m_User.Pos - m_Assist.Pos).Abs().MaxComponent;
-				if (m_Now >= m_WarpTime && dist > 2)
+				if (m_Now >= m_WarpTime && dist > 3)
 				{
 					await m_Assist.CoupleWarp();
 					m_WarpTime = m_Now + TimeSpan.FromSeconds(3.5);
@@ -33,14 +33,14 @@
 			{
 				if (m_Assist.TryCastSkill(Skill.隐身术))
 				{
-					m_HideTime = m_Now + TimeSpan.FromSeconds(m_HasUser ? 5 : 15);
+					m_HideTime = m_Now + TimeSpan.FromSeconds(m_HasUser ? 5 : 20);
 					return 1;
 				}
 			}
 
 			if (TryHeal(m_Assist, m_Assist, ref m_HealTime)) return 1;
 
-			if (m_HasUser && dist <= 8 && m_User.Hp > 0)
+			if (m_HasUser && dist <= 7 && m_User.Hp > 0)
 			{
 				if (TryCastBuff(m_Assist, Skill.强震魔法, m_User) ||
 				    TryCastBuff(m_Assist, Skill.神圣战甲术, m_User) ||
@@ -55,10 +55,10 @@
 					if (targetId != 0)
 					{
 						var target = m_Assist.GetUnit(targetId);
-						if (target.IsValid && target.Type == UnitType.Monster && target.MaxHp >= 1500)
+						if (target.IsValid && target.Type == UnitType.Monster && target.Hp > 0 && target.MaxHp >= 1500)
 						{
-							if (target.RedPoison && m_Assist.TryCastSkill(Skill.施毒术, targetId, SkillPoison.Red) ||
-							    target.GreenPoison && m_Assist.TryCastSkill(Skill.施毒术, targetId, SkillPoison.Green))
+							if (!target.RedPoison && m_Assist.TryCastSkill(Skill.施毒术, target, SkillPoison.Red) ||
+							    !target.GreenPoison && m_Assist.TryCastSkill(Skill.施毒术, target, SkillPoison.Green))
 								return 1;
 						}
 					}
@@ -66,6 +66,9 @@
 
 				if (TryHeal(m_Assist, m_User, ref m_HealUserTime)) return 1;
 			}
+
+			if (TryCastBuff(m_Assist, Skill.神圣战甲术, m_Assist) ||
+			    TryCastBuff(m_Assist, Skill.幽灵盾, m_Assist)) return 1;
 
 			return 0.5;
 		}
@@ -78,7 +81,7 @@
 				int delta = target.MaxHp - target.Hp;
 				if (delta >= 50 || m_Now >= healTime && delta >= 20)
 				{
-					if (self.TryCastSkill(Skill.治愈术, target.Id))
+					if (self.TryCastSkill(Skill.治愈术, target.Self))
 					{
 						healTime = m_Now + TimeSpan.FromSeconds(5);
 						return true;
@@ -92,7 +95,7 @@
 		bool TryCastBuff(Game self, Skill skill, Game target)
 		{
 			var s = self.GetSkill(skill);
-			return s.IsValid && target.Buff.FromSkill(skill, s.Amulet) <= 5 && self.TryCastSkill(skill, target.Id);
+			return s.IsValid && target.Buff.FromSkill(skill, s.Amulet) <= 5 && self.TryCastSkill(skill, target.Self);
 		}
 	}
 }
