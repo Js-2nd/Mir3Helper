@@ -61,11 +61,12 @@ namespace Mir3Helper
 
 		public UnitData GetUnit(int id)
 		{
+			if (id == Id) return Self;
 			UpdateUnits();
 			return m_Units.TryGetValue(id, out var address) ? (Memory, address) : default;
 		}
 
-		public IEnumerable<UnitData> GetUnits()
+		public IEnumerable<UnitData> GetOtherUnits()
 		{
 			UpdateUnits();
 			foreach (var address in m_Units.Values)
@@ -156,17 +157,35 @@ namespace Mir3Helper
 			return true;
 		}
 
-		public bool TryCastSkill(Skill id, int target = 0)
+		public bool TryCastSkill(Skill skillId, int targetId = 0,
+			SkillPoison poison = SkillPoison.None, SkillAmulet amulet = SkillAmulet.None)
 		{
-			var skill = GetSkill(id);
+			var skill = GetSkill(skillId);
 			if (!skill.IsValid) return false;
-			MousePos.Set(SelfScreenPos.ToInt32Pair());
+			if (targetId == 0) targetId = Id;
+			var target = GetUnit(targetId);
+			if (!target.IsValid) return false;
+			switch (skill.TargetLock.Value)
+			{
+				case SkillTargetLock.None:
+					MousePos.Set(MapPosToScreenPos(target.Pos).ToInt32Pair());
+					break;
+				case SkillTargetLock.Any:
+					SkillTarget.Set(targetId);
+					break;
+				case SkillTargetLock.PlayerOnly:
+					SkillTargetPlayerOnly.Set(targetId);
+					break;
+			}
+
+			if (poison != SkillPoison.None) skill.Poison.Set(poison);
+			if (amulet != SkillAmulet.None) skill.Amulet.Set(amulet);
 			var key = skill.Key;
 			if (key != SkillKey.None) Window.Key(key.ToVirtualKey());
 			else
 			{
 				var escKey = skill.EscKey.Value;
-				if (escKey == SkillEscKey.None) ChangeSkillEscKey(id, escKey = SkillEscKey.F12);
+				if (escKey == SkillEscKey.None) ChangeSkillEscKey(skillId, escKey = SkillEscKey.F12);
 				EscKeyTime.Set(Environment.TickCount - 500);
 				Window.Key(escKey.ToVirtualKey());
 			}

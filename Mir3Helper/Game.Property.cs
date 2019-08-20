@@ -62,6 +62,12 @@ namespace Mir3Helper
 
 		public Address UnitAddress(int x, int y) => Memory[0x6BACEC + x * 0x78 + y * 0xD98, 0];
 
+		public Point MapPosToScreenPos(Point pos)
+		{
+			var delta = pos - Pos;
+			return SelfScreenPos + (delta.X * 48, delta.Y * 32);
+		}
+
 		public int TotalOpened => Memory.Read<byte>(0x6EF680);
 		public bool StatusOpened => Memory.Read<bool>(0x76F92C);
 		public Point StatusCloseButton => Memory.Read<Int32Pair>(0x76F9AC);

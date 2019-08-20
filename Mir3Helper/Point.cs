@@ -10,6 +10,10 @@ namespace Mir3Helper
 		public readonly int Y;
 		Point(in Tuple t) => (X, Y) = t;
 
+		public int MaxComponent => Math.Max(X, Y);
+		public int MinComponent => Math.Min(X, Y);
+		public int Sum => X + Y;
+		public Point Abs() => (Math.Abs(X), Math.Abs(Y));
 		public IntPtr ToLParam() => (IntPtr) ((X & 0xFFFF) | (Y << 16));
 		public Int16Pair ToInt16Pair() => new Int16Pair((short) X, (short) Y);
 		public Int32Pair ToInt32Pair() => new Int32Pair(X, Y);
