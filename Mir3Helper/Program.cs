@@ -35,8 +35,7 @@
 				{
 					CheckExit(ref m_User);
 					CheckExit(ref m_Assist);
-					if (!m_Running || m_Assist == null) await Task.Delay(100);
-					else await Task.Delay(TimeSpan.FromSeconds(await Update()));
+					await Task.Delay(TimeSpan.FromSeconds(m_Running && m_Assist != null ? await Update() : 0.1));
 				}
 				catch (Exception ex)
 				{

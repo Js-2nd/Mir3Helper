@@ -1,97 +1,98 @@
 ﻿namespace Mir3Helper
 {
 	using System;
-	using System.Diagnostics;
-	using System.IO;
-	using System.Linq;
 	using System.Threading.Tasks;
 
 	partial class Program
 	{
+		DateTime m_Now;
 		DateTime m_WarpTime;
 		DateTime m_HideTime;
 		DateTime m_HealTime;
+		DateTime m_HealUserTime;
 
 		async Task<double> Update()
 		{
-			if (m_Assist.Moving || m_Assist.Casting) return 0.1;
+			if (m_Assist.Moving || m_Assist.Casting) return 0.2;
+			m_Now = DateTime.UtcNow;
 			m_Assist.Update();
-			int distance = 0;
+			int dist = 0;
 			if (m_HasUser)
 			{
 				m_User.Update();
-				var delta = m_User.Pos - m_Assist.Pos;
-				distance = Math.Max(Math.Abs(delta.X), Math.Abs(delta.Y));
-			}
-
-			var now = DateTime.UtcNow;
-			if (m_HasUser && now >= m_WarpTime && distance > 2)
-			{
-				await m_Assist.CoupleWarp();
-				m_WarpTime = now + TimeSpan.FromSeconds(3.5);
-				return 2;
-			}
-
-			if (now >= m_HideTime && !m_Assist.Hiding)
-			{
-				m_Assist.TryCastSkill(2, m_Assist.Id);
-				m_HideTime = now + TimeSpan.FromSeconds(m_HasUser ? 5 : 15);
-				return 1;
-			}
-
-
-			var heal = m_Assist.GetSkill(Skill.治愈术);
-			if (heal.IsValid)
-			{
-				m_Assist.TryCastSkill(heal, m_Assist.Id);
-			}
-
-			int deltaHp = m_Assist.MaxHp - m_Assist.Hp;
-			if (deltaHp >= 50)
-			{
-			}
-			else if (now >= m_HealTime && deltaHp >= 20)
-			{
-			}
-
-			if (m_Assist.Hp < m_Assist.MaxHp - 20)
-			{
-				m_Assist.TryCastSkill(1, m_Assist.Id);
-				return DefaultActionDelay;
-			}
-
-			if (m_HasUser && distance < 9 && m_User.Hp > 0)
-			{
-//				if (m_User.AllBuffAtkMagic().All(buff => buff < 3))
-////				if (m_User.BuffAtkThunder < 3)
-//				{
-//					m_Assist.CastAssistMagic(9, m_User.Id);
-//					return DefaultActionDelay;
-//				}
-			}
-
-			if (Distance <= 9 && m_User.Hp > 0)
-			{
-//				if (m_User.BuffDef < 5)
-//				{
-//					m_Assist.CastAssistMagic(8, m_User.Id);
-//					return DefaultActionDelay;
-//				}
-
-//				if (m_User.AllBuffDefMagic().All(t => t < 5))
-//				{
-//					m_Assist.CastAssistMagic(7, m_User.Id);
-//					return DefaultActionDelay;
-//				}
-
-				if (!m_Same && m_User.Hp < m_User.MaxHp - 30)
+				dist = (m_User.Pos - m_Assist.Pos).Abs().MaxComponent;
+				if (m_Now >= m_WarpTime && dist > 2)
 				{
-					m_Assist.TryCastSkill(1, m_User.Id);
-					return DefaultActionDelay;
+					await m_Assist.CoupleWarp();
+					m_WarpTime = m_Now + TimeSpan.FromSeconds(3.5);
+					return 2;
 				}
 			}
 
+			if (m_Now >= m_HideTime && !m_Assist.Hiding)
+			{
+				if (m_Assist.TryCastSkill(Skill.隐身术))
+				{
+					m_HideTime = m_Now + TimeSpan.FromSeconds(m_HasUser ? 5 : 15);
+					return 1;
+				}
+			}
+
+			if (TryHeal(m_Assist, m_Assist, ref m_HealTime)) return 1;
+
+			if (m_HasUser && dist <= 8 && m_User.Hp > 0)
+			{
+				if (TryCastBuff(m_Assist, Skill.强震魔法, m_User) ||
+				    TryCastBuff(m_Assist, Skill.神圣战甲术, m_User) ||
+				    TryCastBuff(m_Assist, Skill.幽灵盾, m_User) ||
+				    m_User.Class != PlayerClass.Mage && TryCastBuff(m_Assist, Skill.猛虎强势, m_User))
+					return 1;
+
+				var skill = m_Assist.GetSkill(Skill.施毒术);
+				if (skill.IsValid)
+				{
+					int targetId = m_User.SkillTarget.Value;
+					if (targetId != 0)
+					{
+						var target = m_Assist.GetUnit(targetId);
+						if (target.IsValid && target.Type == UnitType.Monster && target.MaxHp >= 1500)
+						{
+							if (target.RedPoison && m_Assist.TryCastSkill(Skill.施毒术, targetId, SkillPoison.Red) ||
+							    target.GreenPoison && m_Assist.TryCastSkill(Skill.施毒术, targetId, SkillPoison.Green))
+								return 1;
+						}
+					}
+				}
+
+				if (TryHeal(m_Assist, m_User, ref m_HealUserTime)) return 1;
+			}
+
 			return 0.5;
+		}
+
+		bool TryHeal(Game self, Game target, ref DateTime healTime)
+		{
+			var skill = self.GetSkill(Skill.治愈术);
+			if (skill.IsValid)
+			{
+				int delta = target.MaxHp - target.Hp;
+				if (delta >= 50 || m_Now >= healTime && delta >= 20)
+				{
+					if (self.TryCastSkill(Skill.治愈术, target.Id))
+					{
+						healTime = m_Now + TimeSpan.FromSeconds(5);
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		bool TryCastBuff(Game self, Skill skill, Game target)
+		{
+			var s = self.GetSkill(skill);
+			return s.IsValid && target.Buff.FromSkill(skill, s.Amulet) <= 5 && self.TryCastSkill(skill, target.Id);
 		}
 	}
 }
