@@ -221,13 +221,19 @@ namespace Mir3Helper
 			CoupleWarping = false;
 		}
 
-		public void ClickWithBagAction(bool send = false)
+		public void ClickItemWithBagAction(bool send = false)
 		{
 			if (!BagOpened) return;
-			GetCursorPos(out var pos);
-			ScreenToClient(Process.MainWindowHandle, ref pos);
-			Window.Click(pos, send);
+			Window.Click(Window.GetMousePos(), send);
 			Window.Click(BagAction, send);
+		}
+
+		public void ClickItemWithSendMail(bool send = false)
+		{
+			if (!MailOpened || !BagOpened) return;
+			Window.Click(Window.GetMousePos(), send);
+			Window.Click((300, 150), send);
+			Window.Click((310, 270), send);
 		}
 	}
 }

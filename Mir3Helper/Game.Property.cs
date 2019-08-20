@@ -20,9 +20,8 @@ namespace Mir3Helper
 		public bool GreenPoison => Self.GreenPoison;
 		public bool RedPoison => Self.RedPoison;
 		public bool Moving => Self.Moving;
+		public bool Mounting => Memory.Read<bool>(0x7AAF68);
 
-		public Point ScreenSize => Memory.Read<Int32Pair>(0x6658D0);
-		public Point SelfScreenPos => ScreenSize.X == 800 ? (400, 240) : (496, 338);
 		public string Map => Memory.ReadString(0x6AD96D, 32);
 		public int SkillCount => Memory.Read<byte>(0x796EB0);
 		public int Level => Memory.Read<ushort>(0x7AC451);
@@ -68,6 +67,8 @@ namespace Mir3Helper
 			return SelfScreenPos + (delta.X * 48, delta.Y * 32);
 		}
 
+		public Point ScreenSize => Memory.Read<Int32Pair>(0x6658D0);
+		public Point SelfScreenPos => ScreenSize.X == 800 ? (400, 240) : (496, 338);
 		public int TotalOpened => Memory.Read<byte>(0x6EF680);
 		public bool StatusOpened => Memory.Read<bool>(0x76F92C);
 		public Point StatusCloseButton => Memory.Read<Int32Pair>(0x76F9AC);
@@ -81,5 +82,6 @@ namespace Mir3Helper
 		public bool MiniMapDouble => Memory.Read<bool>(0x776B38);
 		public bool MiniMapShowAll => Memory.Read<bool>(0x776B39);
 		public bool ItemShortcutOpened => Memory.Read<bool>(0x78FE40);
+		public bool MailOpened => Memory.Read<bool>(0x792414);
 	}
 }

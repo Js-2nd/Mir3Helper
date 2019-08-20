@@ -38,5 +38,12 @@ namespace Mir3Helper
 			Message(WindowMessage.WM_RBUTTONDOWN, (IntPtr) MK.RBUTTON, lParam, send);
 			Message(WindowMessage.WM_RBUTTONUP, IntPtr.Zero, lParam, send);
 		}
+
+		public Point GetMousePos()
+		{
+			GetCursorPos(out var pos);
+			ScreenToClient(m_Handle, ref pos);
+			return pos;
+		}
 	}
 }

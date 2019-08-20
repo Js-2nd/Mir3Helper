@@ -91,7 +91,11 @@
 			}
 			else if (key == VirtualKey.VK_RCONTROL)
 			{
-				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.ClickWithBagAction();
+				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.ClickItemWithBagAction();
+			}
+			else if (key == VirtualKey.VK_X && m_Input.IsShiftDown())
+			{
+				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.ClickItemWithSendMail();
 			}
 		}
 
