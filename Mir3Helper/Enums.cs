@@ -32,4 +32,13 @@ namespace Mir3Helper
 		Dark = 6,
 		Phantom = 7,
 	}
+
+	public enum AttackMode : byte
+	{
+		All = 0,
+		Peace = 1,
+		Group = 2,
+		Guild = 3,
+		EvilOnly = 4,
+	}
 }

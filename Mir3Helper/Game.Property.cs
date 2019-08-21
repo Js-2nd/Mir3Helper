@@ -36,6 +36,7 @@ namespace Mir3Helper
 		public PlayerClass Class => Memory.Read<PlayerClass>(0x7AC4B3);
 		public int Gold => Memory.Read<int>(0x7AC4B4);
 		public MemoryValue<int> EscKeyTime => Memory.Value(0x66AB14);
+		public MemoryValue<AttackMode> AttackMode => Memory.Value(0x7AC5D5);
 		public MemoryValue<int> AttackTarget => Memory.Value(0x7AC638);
 		public MemoryValue<int> SkillTarget => Memory.Value(0x7AC63C);
 		public MemoryValue<int> SkillTargetPlayerOnly => Memory.Value(0x7AC640);
