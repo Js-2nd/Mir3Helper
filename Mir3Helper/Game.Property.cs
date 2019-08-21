@@ -81,5 +81,6 @@ namespace Mir3Helper
 		public bool MiniMapShowAll => Memory.Read<bool>(0x776B39);
 		public bool ItemShortcutOpened => Memory.Read<bool>(0x78FE40);
 		public bool MailOpened => Memory.Read<bool>(0x792414);
+		public Point YesButton => ScreenSize / 2 - (70, 10);
 	}
 }

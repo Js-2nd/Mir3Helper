@@ -55,11 +55,14 @@
 					if (targetId != 0)
 					{
 						var target = m_Assist.GetUnit(targetId);
-						if (target.IsValid && target.Type == UnitType.Monster && target.Hp > 0 && target.MaxHp >= 1500)
+						if (target.IsValid && target.Hp > 0)
 						{
-							if (!target.RedPoison && m_Assist.TryCastSkill(Skill.施毒术, target, SkillPoison.Red) ||
-							    !target.GreenPoison && m_Assist.TryCastSkill(Skill.施毒术, target, SkillPoison.Green))
-								return 1;
+							if (target.Type == UnitType.Monster && target.MaxHp >= 1500)
+							{
+								if (!target.RedPoison && m_Assist.TryCastSkill(Skill.施毒术, target, SkillPoison.Red) ||
+								    !target.GreenPoison && m_Assist.TryCastSkill(Skill.施毒术, target, SkillPoison.Green))
+									return 1;
+							}
 						}
 					}
 				}
@@ -95,7 +98,9 @@
 		bool TryCastBuff(Game self, Skill skill, Game target)
 		{
 			var s = self.GetSkill(skill);
-			return s.IsValid && target.Buff.FromSkill(skill, s.Amulet) <= 5 && self.TryCastSkill(skill, target.Self);
+			return s.IsValid &&
+			       target.Buff.FromSkill(skill, s.Amulet) <= 5 &&
+			       self.TryCastSkill(skill, target.Self);
 		}
 	}
 }

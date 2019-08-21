@@ -7,7 +7,7 @@
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.2.0";
+		public const string Version = "0.2.1";
 
 		static async Task Main()
 		{
@@ -34,6 +34,7 @@
 			Console.WriteLine("[End] Run / Pause");
 			Console.WriteLine("[`] Assist CoupleWarp");
 			Console.WriteLine("[RightControl] ClickItemWithBagAction");
+			Console.WriteLine("[Shift+A] DropItem");
 			Console.WriteLine("[Shift+X] ClickItemWithSendMail");
 			while (true)
 			{
@@ -96,6 +97,10 @@
 			else if (key == VirtualKey.VK_RCONTROL)
 			{
 				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.ClickItemWithBagAction();
+			}
+			else if (key == VirtualKey.VK_A && m_Input.IsShiftDown())
+			{
+				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.DropItem();
 			}
 			else if (key == VirtualKey.VK_X && m_Input.IsShiftDown())
 			{

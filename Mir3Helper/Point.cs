@@ -22,6 +22,9 @@ namespace Mir3Helper
 		public static Point operator -(in Point p) => (-p.X, -p.Y);
 		public static Point operator +(in Point p, in Point q) => (p.X + q.X, p.Y + q.Y);
 		public static Point operator -(in Point p, in Point q) => (p.X - q.X, p.Y - q.Y);
+		public static Point operator *(in Point p, int num) => (p.X * num, p.Y * num);
+		public static Point operator *(int num, in Point p) => (p.X * num, p.Y * num);
+		public static Point operator /(in Point p, int num) => (p.X / num, p.Y / num);
 
 		public static implicit operator Point(in Tuple t) => new Point(t);
 		public static implicit operator Point(in Int16Pair p) => (p.First, p.Second);

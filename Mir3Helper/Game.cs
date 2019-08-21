@@ -211,6 +211,13 @@ namespace Mir3Helper
 			Window.Click(BagAction, send);
 		}
 
+		public void DropItem(bool send = false)
+		{
+			if (!BagOpened) return;
+			Window.Click(Window.GetMousePos(), send);
+			Window.Click(YesButton, send);
+		}
+
 		public void ClickItemWithSendMail(bool send = false)
 		{
 			if (!MailOpened || !BagOpened) return;
