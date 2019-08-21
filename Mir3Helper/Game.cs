@@ -43,20 +43,6 @@ namespace Mir3Helper
 		{
 			m_UnitsCached = false;
 			m_SkillsCached = false;
-			if (m_Id != null)
-			{
-				int id = Self.Id;
-				if (m_Id != id)
-				{
-					m_Id = id;
-					OnIdChange();
-				}
-			}
-		}
-
-		void OnIdChange()
-		{
-			m_Name = null;
 		}
 
 		public UnitData GetUnit(int id)
@@ -167,12 +153,9 @@ namespace Mir3Helper
 			if (!target.IsValid) return false;
 			var skill = GetSkill(skillId);
 			if (!skill.IsValid) return false;
-			Console.WriteLine($"{skillId} => {target.Name}");
+			MousePos.Set(MapPosToScreenPos(target.Pos).ToInt32Pair());
 			switch (skill.TargetLock.Value)
 			{
-				case SkillTargetLock.None:
-					MousePos.Set(MapPosToScreenPos(target.Pos).ToInt32Pair());
-					break;
 				case SkillTargetLock.Any:
 					SkillTarget.Set(target.Id);
 					break;

@@ -2,12 +2,9 @@ namespace Mir3Helper
 {
 	partial class Game
 	{
-		int? m_Id;
-		string m_Name;
-
 		public UnitData Self => Memory.Value(0x7A8020);
-		public int Id => m_Id ?? (m_Id = Self.Id).Value;
-		public string Name => m_Name ?? (m_Name = Self.Name);
+		public int Id => Self.Id;
+		public string Name => Self.Name;
 		public Point Pos => Self.Pos;
 		public bool Casting => Self.Casting;
 		public bool Attacking => Self.Attacking;

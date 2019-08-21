@@ -65,7 +65,6 @@
 			{
 				if (Game.GetForeground(ref m_User) >= 0)
 				{
-					m_User.Update();
 					OnGameChange();
 					Console.WriteLine($"User => {m_User.Name}");
 				}
@@ -74,7 +73,6 @@
 			{
 				if (Game.GetForeground(ref m_Assist) >= 0)
 				{
-					m_Assist.Update();
 					OnGameChange();
 					Console.WriteLine($"Assist => {m_Assist.Name}");
 				}
