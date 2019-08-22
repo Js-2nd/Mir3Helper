@@ -6,7 +6,7 @@ namespace Mir3Helper
 	{
 		public readonly Memory Memory;
 		public readonly Address Address;
-		UnitData(in Tuple t) => (Memory, Address) = t;
+		public UnitData(in Tuple t) => (Memory, Address) = t;
 
 		public bool IsValid => Memory != null && Address.Value != 0;
 		public UnitType Type => Memory.Read<UnitType>(Address);

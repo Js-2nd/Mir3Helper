@@ -153,7 +153,7 @@ namespace Mir3Helper
 			if (!target.IsValid) return false;
 			var skill = GetSkill(skillId);
 			if (!skill.IsValid) return false;
-			MousePos.Set(MapPosToScreenPos(target.Pos).ToInt32Pair());
+			MousePos.Set(MapToScreen(target.Pos).ToInt32Pair());
 			switch (skill.TargetLock.Value)
 			{
 				case SkillTargetLock.Any:
@@ -167,13 +167,13 @@ namespace Mir3Helper
 			if (poison != SkillPoison.None) skill.Poison.Set(poison);
 			if (amulet != SkillAmulet.None) skill.Amulet.Set(amulet);
 			var key = skill.Key;
-			if (key != SkillKey.None) Window.Key(key.ToVirtualKey());
+			if (key != SkillKey.None) Window.KeyDown(key.ToVirtualKey());
 			else
 			{
 				var escKey = skill.EscKey.Value;
 				if (escKey == SkillEscKey.None) ChangeSkillEscKey(skillId, escKey = SkillEscKey.F12);
 				EscKeyTime.Set(Environment.TickCount - 500);
-				Window.Key(escKey.ToVirtualKey());
+				Window.KeyDown(escKey.ToVirtualKey());
 			}
 
 			return true;
@@ -188,17 +188,17 @@ namespace Mir3Helper
 			bool opened = StatusOpened;
 			if (opened)
 			{
-				Window.Key(VirtualKey.VK_Q, send);
+				Window.KeyDown(VirtualKey.VK_Q, send);
 				await Task.Delay(20);
 			}
 
-			Window.Key(VirtualKey.VK_Q, send);
+			Window.KeyDown(VirtualKey.VK_Q, send);
 			await Task.Delay(20);
 			Window.DoubleClick(StatusLeftRing, send);
 			if (!opened)
 			{
 				await Task.Delay(20);
-				Window.Key(VirtualKey.VK_Q, send);
+				Window.KeyDown(VirtualKey.VK_Q, send);
 			}
 
 			CoupleWarping = false;
@@ -207,21 +207,21 @@ namespace Mir3Helper
 		public void ClickItemWithBagAction(bool send = false)
 		{
 			if (!BagOpened) return;
-			Window.Click(Window.GetMousePos(), send);
+			Window.Click(Window.MousePos, send);
 			Window.Click(BagAction, send);
 		}
 
 		public void DropItem(bool send = false)
 		{
 			if (!BagOpened) return;
-			Window.Click(Window.GetMousePos(), send);
+			Window.Click(Window.MousePos, send);
 			Window.Click(YesButton, send);
 		}
 
 		public void ClickItemWithSendMail(bool send = false)
 		{
 			if (!MailOpened || !BagOpened) return;
-			Window.Click(Window.GetMousePos(), send);
+			Window.Click(Window.MousePos, send);
 			Window.Click((300, 150), send);
 			Window.Click((310, 270), send);
 		}

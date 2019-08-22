@@ -7,12 +7,12 @@
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.2.1";
+		public const string Version = "0.2.2";
 
 		static async Task Main()
 		{
 			Console.WriteLine($"Mir3Helper v{Version}");
-			Console.SetError(new StreamWriter("error.txt", true) {AutoFlush = true});
+//			Console.SetError(new StreamWriter("error.txt", true) {AutoFlush = true});
 			AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
 				Console.Error.WriteLine(args.ExceptionObject);
 			await new Program().Start();
@@ -21,6 +21,7 @@
 		InputSystem m_Input;
 		bool m_Running;
 		bool m_HasUser;
+		bool m_AutoWarp = true;
 		Game m_User;
 		Game m_Assist;
 		Game m_Temp;
@@ -32,7 +33,8 @@
 			Console.WriteLine("[PageUp] Set User");
 			Console.WriteLine("[PageDown] Set Assist");
 			Console.WriteLine("[End] Run / Pause");
-			Console.WriteLine("[`] Assist CoupleWarp");
+			Console.WriteLine("[`] Assist Warp");
+			Console.WriteLine("[Shift+`] Toggle Auto Assist Warp");
 			Console.WriteLine("[RightControl] ClickItemWithBagAction");
 			Console.WriteLine("[Shift+A] DropItem");
 			Console.WriteLine("[Shift+X] ClickItemWithSendMail");
@@ -52,6 +54,7 @@
 					}
 
 					await Task.Delay(TimeSpan.FromSeconds(m_Running && m_Assist != null ? await Update() : 0.1));
+					GC.Collect();
 				}
 				catch (Exception ex)
 				{
@@ -92,7 +95,12 @@
 			}
 			else if (key == VirtualKey.VK_OEM_3)
 			{
-				m_Assist?.CoupleWarp();
+				if (m_Input.IsShiftDown())
+				{
+					m_AutoWarp = !m_AutoWarp;
+					Console.WriteLine($"Auto Assist Warp => {m_AutoWarp.ToString()}");
+				}
+				else m_Assist?.CoupleWarp();
 			}
 			else if (key == VirtualKey.VK_RCONTROL)
 			{

@@ -58,12 +58,7 @@ namespace Mir3Helper
 		}
 
 		public Address UnitAddress(int x, int y) => Memory[0x6BACEC + x * 0x78 + y * 0xD98, 0];
-
-		public Point MapPosToScreenPos(Point pos)
-		{
-			var delta = pos - Pos;
-			return SelfScreenPos + (delta.X * 48, delta.Y * 32);
-		}
+		public Point MapToScreen(Point mapPos) => (mapPos - Pos).Scale((48, 32)) + SelfScreenPos;
 
 		public Point ScreenSize => Memory.Read<Int32Pair>(0x6658D0);
 		public Point SelfScreenPos => ScreenSize.X == 800 ? (400, 240) : (496, 338);
@@ -77,8 +72,8 @@ namespace Mir3Helper
 		public Point BagAction => BagCloseButton + (-25, 10);
 		public bool SkillOpened => Memory.Read<bool>(0x7956A0);
 		public bool MiniMapOpened => Memory.Read<bool>(0x776AA4);
-		public bool MiniMapDouble => Memory.Read<bool>(0x776B38);
-		public bool MiniMapShowAll => Memory.Read<bool>(0x776B39);
+		public bool MiniMapDoubled => Memory.Read<bool>(0x776B38);
+		public bool MiniMapAllShown => Memory.Read<bool>(0x776B39);
 		public bool ItemShortcutOpened => Memory.Read<bool>(0x78FE40);
 		public bool MailOpened => Memory.Read<bool>(0x792414);
 		public Point YesButton => ScreenSize / 2 - (70, 10);

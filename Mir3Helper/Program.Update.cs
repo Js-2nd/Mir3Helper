@@ -21,7 +21,7 @@
 			{
 				m_User.Update();
 				dist = (m_User.Pos - m_Assist.Pos).Abs().MaxComponent;
-				if (m_Now >= m_WarpTime && dist > 3)
+				if (m_AutoWarp && dist > 3 && m_Now >= m_WarpTime && m_Assist.Hp > 0)
 				{
 					await m_Assist.CoupleWarp();
 					m_WarpTime = m_Now + TimeSpan.FromSeconds(3.5);
@@ -99,7 +99,7 @@
 		{
 			var s = self.GetSkill(skill);
 			return s.IsValid &&
-			       target.Buff.FromSkill(skill, s.Amulet) <= 5 &&
+			       target.Buff.CanReceive(skill, s.Amulet) &&
 			       self.TryCastSkill(skill, target.Self);
 		}
 	}

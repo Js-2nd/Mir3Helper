@@ -35,7 +35,7 @@ namespace Mir3Helper
 
 	public enum AttackMode : byte
 	{
-		All = 0,
+		Any = 0,
 		Peace = 1,
 		Group = 2,
 		Guild = 3,

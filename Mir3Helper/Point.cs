@@ -8,7 +8,7 @@ namespace Mir3Helper
 	{
 		public readonly int X;
 		public readonly int Y;
-		Point(in Tuple t) => (X, Y) = t;
+		public Point(in Tuple t) => (X, Y) = t;
 
 		public int MaxComponent => Math.Max(X, Y);
 		public int MinComponent => Math.Min(X, Y);
@@ -17,6 +17,7 @@ namespace Mir3Helper
 		public IntPtr ToLParam() => (IntPtr) ((X & 0xFFFF) | (Y << 16));
 		public Int16Pair ToInt16Pair() => new Int16Pair((short) X, (short) Y);
 		public Int32Pair ToInt32Pair() => new Int32Pair(X, Y);
+		public Point Scale(in Point scale) => (X * scale.X, Y * scale.Y);
 		public override string ToString() => $"({X.ToString()}, {Y.ToString()})";
 
 		public static Point operator -(in Point p) => (-p.X, -p.Y);

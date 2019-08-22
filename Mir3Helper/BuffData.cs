@@ -19,34 +19,38 @@ namespace Mir3Helper
 		public int ResistThunder => Memory.Read<int>(0x7D53D8);
 		public int ResistWind => Memory.Read<int>(0x7D53DC);
 
-		public int? FromSkill(Skill skill, SkillAmulet amulet = SkillAmulet.None)
+		public bool CanReceive(Skill skill, SkillAmulet amulet = SkillAmulet.None, int ignoreTime = 5)
 		{
 			switch (skill)
 			{
 				case Skill.幽灵盾:
 					switch (amulet)
 					{
-						case SkillAmulet.Normal: return Resist;
-						case SkillAmulet.Fire: return ResistFire;
-						case SkillAmulet.Ice: return ResistIce;
-						case SkillAmulet.Thunder: return ResistThunder;
-						case SkillAmulet.Wind: return ResistWind;
-						default: return null;
+						case SkillAmulet.Normal: return Resist <= ignoreTime;
+						case SkillAmulet.Fire:
+						case SkillAmulet.Ice:
+						case SkillAmulet.Thunder:
+						case SkillAmulet.Wind:
+							return ResistFire <= ignoreTime || ResistIce <= ignoreTime ||
+							       ResistThunder <= ignoreTime || ResistWind <= ignoreTime;
+						default: return false;
 					}
-				case Skill.神圣战甲术: return Defense;
+				case Skill.神圣战甲术: return Defense <= ignoreTime;
 				case Skill.强震魔法:
 					switch (amulet)
 					{
-						case SkillAmulet.Normal: return Magic;
-						case SkillAmulet.Fire: return AttackFire;
-						case SkillAmulet.Ice: return AttackIce;
-						case SkillAmulet.Thunder: return AttackThunder;
-						case SkillAmulet.Wind: return AttackWind;
-						case SkillAmulet.Holy: return AttackHoly;
-						default: return null;
+						case SkillAmulet.Normal:
+						case SkillAmulet.Fire:
+						case SkillAmulet.Ice:
+						case SkillAmulet.Thunder:
+						case SkillAmulet.Wind:
+						case SkillAmulet.Holy:
+							return Magic <= ignoreTime || AttackFire <= ignoreTime || AttackIce <= ignoreTime ||
+							       AttackThunder <= ignoreTime || AttackWind <= ignoreTime || AttackHoly <= ignoreTime;
+						default: return false;
 					}
-				case Skill.猛虎强势: return Attack;
-				default: return null;
+				case Skill.猛虎强势: return Attack <= ignoreTime;
+				default: return false;
 			}
 		}
 	}

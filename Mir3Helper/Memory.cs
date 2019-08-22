@@ -28,7 +28,7 @@ namespace Mir3Helper
 		{
 			get
 			{
-				Address address = 0;
+				Address address = default;
 				if (module != null) m_Modules.TryGetValue(module.Name, out address);
 				int count = offsets.Length;
 				if (count > 0)
@@ -83,7 +83,7 @@ namespace Mir3Helper
 
 		unsafe int WriteBuffer(Address address, int size)
 		{
-			if (size > m_Buffer.Length) throw new ArgumentOutOfRangeException(nameof(size));
+//			if (size > m_Buffer.Length) throw new ArgumentOutOfRangeException(nameof(size));
 			var count = IntPtr.Zero;
 			fixed (byte* ptr = m_Buffer)
 				Kernel32.WriteProcessMemory(m_Handle, (void*) address.Value, ptr, (IntPtr) size, &count);

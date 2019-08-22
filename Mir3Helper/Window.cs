@@ -6,18 +6,23 @@ namespace Mir3Helper
 
 	public sealed class Window
 	{
-		readonly IntPtr m_Handle;
-		public Window(Process process) => m_Handle = process.MainWindowHandle;
+		public readonly IntPtr Handle;
+		public Window(Process process) => Handle = process.MainWindowHandle;
 
 		public void Message(WindowMessage message, IntPtr wParam = default, IntPtr lParam = default, bool send = false)
 		{
-			if (send) SendMessage(m_Handle, message, wParam, lParam);
-			else PostMessage(m_Handle, message, wParam, lParam);
+			if (send) SendMessage(Handle, message, wParam, lParam);
+			else PostMessage(Handle, message, wParam, lParam);
 		}
 
-		public void Key(VirtualKey key, bool send = false)
+		public void KeyDown(VirtualKey key, bool send = false)
 		{
 			Message(WindowMessage.WM_IME_KEYDOWN, (IntPtr) key, IntPtr.Zero, send);
+		}
+
+		public void KeyUp(VirtualKey key, bool send = false)
+		{
+			Message(WindowMessage.WM_IME_KEYUP, (IntPtr) key, IntPtr.Zero, send);
 		}
 
 		public void Click(in Point point, bool send = false)
@@ -34,16 +39,28 @@ namespace Mir3Helper
 
 		public void RightClick(in Point point, bool send = false)
 		{
-			var lParam = point.ToLParam();
-			Message(WindowMessage.WM_RBUTTONDOWN, (IntPtr) MK.RBUTTON, lParam, send);
-			Message(WindowMessage.WM_RBUTTONUP, IntPtr.Zero, lParam, send);
+			RightClickDown(point, send);
+			RightClickUp(point, send);
 		}
 
-		public Point GetMousePos()
+		public void RightClickDown(in Point point, bool send = false)
 		{
-			GetCursorPos(out var pos);
-			ScreenToClient(m_Handle, ref pos);
-			return pos;
+			Message(WindowMessage.WM_RBUTTONDOWN, (IntPtr) MK.RBUTTON, point.ToLParam(), send);
+		}
+
+		public void RightClickUp(in Point point, bool send = false)
+		{
+			Message(WindowMessage.WM_RBUTTONUP, IntPtr.Zero, point.ToLParam(), send);
+		}
+
+		public Point MousePos
+		{
+			get
+			{
+				GetCursorPos(out var pos);
+				ScreenToClient(Handle, ref pos);
+				return pos;
+			}
 		}
 	}
 }
