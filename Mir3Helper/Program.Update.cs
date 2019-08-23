@@ -29,58 +29,55 @@
 				}
 			}
 
-			if (m_Now >= m_HideTime && !m_Assist.Hiding)
+			if (m_Now >= m_HideTime && !m_Assist.Hiding && m_Assist.TryCastSkill(Skill.隐身术))
 			{
-				if (m_Assist.TryCastSkill(Skill.隐身术))
+				m_HideTime = m_Now + TimeSpan.FromSeconds(m_HasUser ? 5 : 20);
+				return 1;
+			}
+
+			if (TryHeal(m_Assist, m_Assist, 50) ||
+			    m_Now >= m_HealTime && TryHeal(m_Assist, m_Assist, 10))
+			{
+				m_HealTime = m_Now + TimeSpan.FromSeconds(5);
+				return 1;
+			}
+
+			if (m_HasUser && dist <= 7 && m_User.Hp > 0)
+			{
+				if (TryBuff(m_Assist, m_User, Skill.幽灵盾) ||
+				    TryBuff(m_Assist, m_User, Skill.神圣战甲术) ||
+				    TryBuff(m_Assist, m_User, Skill.强震魔法) ||
+				    m_User.Class != PlayerClass.Mage && TryBuff(m_Assist, m_User, Skill.猛虎强势))
+					return 1;
+				if (TryHeal(m_Assist, m_User, 50) ||
+				    m_Now >= m_HealUserTime && TryHeal(m_Assist, m_User, 10))
 				{
-					m_HideTime = m_Now + TimeSpan.FromSeconds(m_HasUser ? 5 : 20);
+					m_HealUserTime = m_Now + TimeSpan.FromSeconds(5);
 					return 1;
 				}
 			}
 
-			if (TryHeal(m_Assist, m_Assist, ref m_HealTime)) return 1;
-
-			if (m_HasUser && dist <= 7 && m_User.Hp > 0)
-			{
-				if (TryBuff(m_Assist, m_User, Skill.强震魔法) ||
-				    TryBuff(m_Assist, m_User, Skill.神圣战甲术) ||
-				    TryBuff(m_Assist, m_User, Skill.幽灵盾) ||
-				    m_User.Class != PlayerClass.Mage && TryBuff(m_Assist, m_User, Skill.猛虎强势))
-					return 1;
-
-				if (TryHeal(m_Assist, m_User, ref m_HealUserTime)) return 1;
-			}
-
-			if (TryBuff(m_Assist, m_Assist, Skill.神圣战甲术) ||
-			    TryBuff(m_Assist, m_Assist, Skill.幽灵盾)) return 1;
-
+			if (TryBuff(m_Assist, m_Assist, Skill.幽灵盾) ||
+			    TryBuff(m_Assist, m_Assist, Skill.神圣战甲术)) return 1;
 			if (m_HasUser && TryPoison(m_Assist, m_User)) return 1;
 			return 0.5;
 		}
 
-		bool TryHeal(Game self, Game target, ref DateTime healTime, int n = 20, int m = 50)
+		bool TryHeal(Game self, Game target, int deltaHp)
 		{
 			var skill = self.GetSkill(Skill.治愈术);
-			if (skill.IsValid)
-			{
-				int delta = target.MaxHp - target.Hp;
-				if (delta >= 50 || m_Now >= healTime && delta >= 20)
-				{
-					if (self.TryCastSkill(Skill.治愈术, target.Self))
-					{
-						healTime = m_Now + TimeSpan.FromSeconds(5);
-						return true;
-					}
-				}
-			}
-
-			return false;
+			if (!skill.IsValid) return false;
+			if (target.MaxHp - target.Hp < deltaHp) return false;
+			return self.TryCastSkill(Skill.治愈术, target.Self);
 		}
 
 		bool TryBuff(Game self, Game target, Skill skill)
 		{
 			var data = self.GetSkill(skill);
-			return data.IsValid && target.Buff.CanReceive(skill, data.Amulet) && self.TryCastSkill(skill, target.Self);
+			if (!data.IsValid) return false;
+			if (!target.Buff.CanReceive(skill, data.Amulet)) return false;
+			if (self.AttackMode != AttackMode.Peace) self.AttackMode.Set(AttackMode.Peace);
+			return self.TryCastSkill(skill, target.Self);
 		}
 
 		int m_PoisonTarget;
@@ -116,17 +113,21 @@
 			}
 			else return false;
 
-			// TODO
-			var poison = SkillPoison.None;
-			if (m_Now >= m_RedPoisonTime && !target.RedPoison) poison = SkillPoison.Red;
-			if (poison == SkillPoison.None && m_Now >= m_GreenPoisonTime && !target.GreenPoison)
-				poison = SkillPoison.Green;
-			if (poison == SkillPoison.None) return false;
-			if (self.TryCastSkill(Skill.施毒术, target, poison))
+			if (m_Now >= m_RedPoisonTime && !target.RedPoison)
 			{
-				if (poison == SkillPoison.Red) m_RedPoisonTime = m_Now + TimeSpan.FromSeconds(20);
-				else if (poison == SkillPoison.Green) m_GreenPoisonTime = m_Now + TimeSpan.FromSeconds(20);
-				return true;
+				if (self.TryCastSkill(Skill.施毒术, target, SkillPoison.Red))
+				{
+					m_RedPoisonTime = m_Now + TimeSpan.FromSeconds(20);
+					return true;
+				}
+			}
+			else if (m_Now >= m_GreenPoisonTime && !target.GreenPoison)
+			{
+				if (self.TryCastSkill(Skill.施毒术, target, SkillPoison.Green))
+				{
+					m_GreenPoisonTime = m_Now + TimeSpan.FromSeconds(20);
+					return true;
+				}
 			}
 
 			return false;

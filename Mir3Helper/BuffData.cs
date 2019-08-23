@@ -31,8 +31,8 @@ namespace Mir3Helper
 						case SkillAmulet.Ice:
 						case SkillAmulet.Thunder:
 						case SkillAmulet.Wind:
-							return ResistFire <= ignoreTime || ResistIce <= ignoreTime ||
-							       ResistThunder <= ignoreTime || ResistWind <= ignoreTime;
+							return ResistFire <= ignoreTime && ResistIce <= ignoreTime &&
+							       ResistThunder <= ignoreTime && ResistWind <= ignoreTime;
 						default: return false;
 					}
 				case Skill.神圣战甲术: return Defense <= ignoreTime;
@@ -45,8 +45,8 @@ namespace Mir3Helper
 						case SkillAmulet.Thunder:
 						case SkillAmulet.Wind:
 						case SkillAmulet.Holy:
-							return Magic <= ignoreTime || AttackFire <= ignoreTime || AttackIce <= ignoreTime ||
-							       AttackThunder <= ignoreTime || AttackWind <= ignoreTime || AttackHoly <= ignoreTime;
+							return Magic <= ignoreTime && AttackFire <= ignoreTime && AttackIce <= ignoreTime &&
+							       AttackThunder <= ignoreTime && AttackWind <= ignoreTime && AttackHoly <= ignoreTime;
 						default: return false;
 					}
 				case Skill.猛虎强势: return Attack <= ignoreTime;

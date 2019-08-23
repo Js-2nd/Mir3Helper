@@ -7,12 +7,12 @@
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.2.2";
+		public const string Version = "0.2.3";
 
 		static async Task Main()
 		{
 			Console.WriteLine($"Mir3Helper v{Version}");
-//			Console.SetError(new StreamWriter("error.txt", true) {AutoFlush = true});
+			Console.SetError(new StreamWriter("error.txt", true) {AutoFlush = true});
 			AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
 				Console.Error.WriteLine(args.ExceptionObject);
 			await new Program().Start();
@@ -37,7 +37,7 @@
 			Console.WriteLine("[Shift+`] Toggle Auto Assist Warp");
 			Console.WriteLine("[Shift+A] Bag Action With Mouse Item");
 			Console.WriteLine("[Shift+S] Send Mail With Mouse Item");
-			Console.WriteLine("[Shift+X] Drop Mouse Item");
+			Console.WriteLine("[RightControl] Drop Mouse Item");
 			while (true)
 			{
 				try
@@ -107,7 +107,7 @@
 			{
 				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.SendMailWithMouseItem();
 			}
-			else if (key == VirtualKey.VK_X && m_Input.IsShiftDown())
+			else if (key == VirtualKey.VK_RCONTROL)
 			{
 				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.DropMouseItem();
 			}
