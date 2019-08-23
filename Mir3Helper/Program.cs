@@ -69,7 +69,7 @@
 			{
 				if (Game.GetForeground(ref m_User) >= 0)
 				{
-					OnGameChange();
+					OnGameChange(ref m_User);
 					Console.WriteLine($"User => {m_User.Name}");
 				}
 			}
@@ -77,16 +77,13 @@
 			{
 				if (Game.GetForeground(ref m_Assist) >= 0)
 				{
-					OnGameChange();
+					OnGameChange(ref m_Assist);
 					Console.WriteLine($"Assist => {m_Assist.Name}");
 				}
 			}
 			else if (key == VirtualKey.VK_END)
 			{
-				if (!m_Running && m_Assist == null)
-				{
-					Console.WriteLine("Assist not set");
-				}
+				if (!m_Running && m_Assist == null) Console.WriteLine("Assist not set");
 				else
 				{
 					m_Running = !m_Running;
@@ -120,12 +117,13 @@
 		{
 			if (game == null || !game.Process.HasExited) return false;
 			game = null;
-			OnGameChange();
+			OnGameChange(ref game);
 			return true;
 		}
 
-		void OnGameChange()
+		void OnGameChange(ref Game game)
 		{
+			game?.Init();
 			m_HasUser = m_User != null && m_Assist != null && m_User.Process.Id != m_Assist.Process.Id;
 		}
 	}

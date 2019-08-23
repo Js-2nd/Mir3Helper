@@ -39,17 +39,30 @@ namespace Mir3Helper
 		Dictionary<SkillKey, int> m_SkillKeys;
 		Dictionary<SkillEscKey, int> m_SkillEscKeys;
 
+		public void Init()
+		{
+			m_Id = 0;
+			m_SkillsCached = false;
+			Update();
+		}
+
 		public void Update()
 		{
 			m_UnitsCached = false;
-			m_SkillsCached = false;
+			if (m_SkillsCached && SkillOpened) m_SkillsCached = false;
 		}
 
 		public UnitData GetUnit(int id)
 		{
 			if (id == Id) return Self;
-			UpdateUnits();
-			return m_Units.TryGetValue(id, out var address) ? (Memory, address) : default;
+			while (true)
+			{
+				UpdateUnits();
+				if (!m_Units.TryGetValue(id, out var address)) return default;
+				UnitData unit = (Memory, address);
+				if (unit.Id == id) return unit;
+				m_UnitsCached = false;
+			}
 		}
 
 		public IEnumerable<UnitData> GetOtherUnits()
@@ -76,20 +89,38 @@ namespace Mir3Helper
 
 		public SkillData GetSkill(Skill id)
 		{
-			UpdateSkills();
-			return m_Skills.TryGetValue(id, out int index) ? (Memory, index) : default(SkillData);
+			while (true)
+			{
+				UpdateSkills();
+				if (!m_Skills.TryGetValue(id, out int index)) return default;
+				SkillData skill = (Memory, index);
+				if (skill.Id == id) return skill;
+				m_SkillsCached = false;
+			}
 		}
 
 		public SkillData GetSkill(SkillKey key)
 		{
-			UpdateSkills();
-			return m_SkillKeys.TryGetValue(key, out int index) ? (Memory, index) : default(SkillData);
+			while (true)
+			{
+				UpdateSkills();
+				if (!m_SkillKeys.TryGetValue(key, out int index)) return default;
+				SkillData skill = (Memory, index);
+				if (skill.Key == key) return skill;
+				m_SkillsCached = false;
+			}
 		}
 
 		public SkillData GetSkill(SkillEscKey escKey)
 		{
-			UpdateSkills();
-			return m_SkillEscKeys.TryGetValue(escKey, out int index) ? (Memory, index) : default(SkillData);
+			while (true)
+			{
+				UpdateSkills();
+				if (!m_SkillEscKeys.TryGetValue(escKey, out int index)) return default;
+				SkillData skill = (Memory, index);
+				if (skill.EscKey == escKey) return skill;
+				m_SkillsCached = false;
+			}
 		}
 
 		void UpdateSkills()
@@ -121,12 +152,17 @@ namespace Mir3Helper
 		{
 			var skill = GetSkill(id);
 			if (!skill.IsValid) return false;
-			var oldSkill = GetSkill(key);
-			if (oldSkill.IsValid) oldSkill.SetKey(SkillKey.None);
 			var oldKey = skill.Key;
+			if (oldKey == key) return false;
 			if (oldKey != SkillKey.None) m_SkillKeys.Remove(oldKey);
+			if (key != SkillKey.None)
+			{
+				var oldSkill = GetSkill(key);
+				if (oldSkill.IsValid) oldSkill.SetKey(SkillKey.None);
+				m_SkillKeys[key] = skill.Index;
+			}
+
 			skill.SetKey(key);
-			m_SkillKeys[key] = skill.Index;
 			return true;
 		}
 
@@ -134,24 +170,29 @@ namespace Mir3Helper
 		{
 			var skill = GetSkill(id);
 			if (!skill.IsValid) return false;
-			var oldSkill = GetSkill(escKey);
-			if (oldSkill.IsValid) oldSkill.EscKey.Set(SkillEscKey.None);
 			var oldEscKey = skill.EscKey.Value;
+			if (oldEscKey == escKey) return false;
 			if (oldEscKey != SkillEscKey.None) m_SkillEscKeys.Remove(oldEscKey);
+			if (escKey != SkillEscKey.None)
+			{
+				var oldSkill = GetSkill(escKey);
+				if (oldSkill.IsValid) oldSkill.EscKey.Set(SkillEscKey.None);
+				m_SkillEscKeys[escKey] = skill.Index;
+			}
+
 			skill.EscKey.Set(escKey);
-			m_SkillEscKeys[escKey] = skill.Index;
 			return true;
 		}
 
-		public bool TryCastSkill(Skill skillId, int targetId = 0,
+		public bool TryCastSkill(Skill id, int target = 0,
 			SkillPoison poison = SkillPoison.None, SkillAmulet amulet = SkillAmulet.None) =>
-			TryCastSkill(skillId, targetId == 0 ? Self : GetUnit(targetId), poison, amulet);
+			TryCastSkill(id, target == 0 ? Self : GetUnit(target), poison, amulet);
 
-		public bool TryCastSkill(Skill skillId, in UnitData target,
+		public bool TryCastSkill(Skill id, in UnitData target,
 			SkillPoison poison = SkillPoison.None, SkillAmulet amulet = SkillAmulet.None)
 		{
 			if (!target.IsValid) return false;
-			var skill = GetSkill(skillId);
+			var skill = GetSkill(id);
 			if (!skill.IsValid) return false;
 			MousePos.Set(MapToScreen(target.Pos).ToInt32Pair());
 			switch (skill.TargetLock.Value)
@@ -171,7 +212,7 @@ namespace Mir3Helper
 			else
 			{
 				var escKey = skill.EscKey.Value;
-				if (escKey == SkillEscKey.None) ChangeSkillEscKey(skillId, escKey = SkillEscKey.F12);
+				if (escKey == SkillEscKey.None) ChangeSkillEscKey(id, escKey = SkillEscKey.F12);
 				EscKeyTime.Set(Environment.TickCount - 500);
 				Window.KeyDown(escKey.ToVirtualKey());
 			}
