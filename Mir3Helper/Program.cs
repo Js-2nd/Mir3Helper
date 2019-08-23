@@ -35,9 +35,9 @@
 			Console.WriteLine("[End] Run / Pause");
 			Console.WriteLine("[`] Assist Warp");
 			Console.WriteLine("[Shift+`] Toggle Auto Assist Warp");
-			Console.WriteLine("[RightControl] ClickItemWithBagAction");
-			Console.WriteLine("[Shift+A] DropItem");
-			Console.WriteLine("[Shift+X] ClickItemWithSendMail");
+			Console.WriteLine("[Shift+A] Bag Action With Mouse Item");
+			Console.WriteLine("[Shift+S] Send Mail With Mouse Item");
+			Console.WriteLine("[Shift+X] Drop Mouse Item");
 			while (true)
 			{
 				try
@@ -99,17 +99,17 @@
 				}
 				else m_Assist?.CoupleWarp();
 			}
-			else if (key == VirtualKey.VK_RCONTROL)
-			{
-				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.ClickItemWithBagAction();
-			}
 			else if (key == VirtualKey.VK_A && m_Input.IsShiftDown())
 			{
-				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.DropItem();
+				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.BagActionWithMouseItem();
+			}
+			else if (key == VirtualKey.VK_S && m_Input.IsShiftDown())
+			{
+				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.SendMailWithMouseItem();
 			}
 			else if (key == VirtualKey.VK_X && m_Input.IsShiftDown())
 			{
-				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.ClickItemWithSendMail();
+				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.DropMouseItem();
 			}
 		}
 

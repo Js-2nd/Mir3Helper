@@ -245,26 +245,26 @@ namespace Mir3Helper
 			CoupleWarping = false;
 		}
 
-		public void ClickItemWithBagAction(bool send = false)
+		public void SendMailWithMouseItem(bool send = false)
+		{
+			if (!MailOpened || !BagOpened) return;
+			Window.Click(Window.MousePos, send);
+			Window.Click((300, 150), send);
+			Window.Click((310, 270), send);
+		}
+
+		public void BagActionWithMouseItem(bool send = false)
 		{
 			if (!BagOpened) return;
 			Window.Click(Window.MousePos, send);
 			Window.Click(BagAction, send);
 		}
 
-		public void DropItem(bool send = false)
+		public void DropMouseItem(bool send = false)
 		{
 			if (!BagOpened) return;
 			Window.Click(Window.MousePos, send);
 			Window.Click(YesButton, send);
-		}
-
-		public void ClickItemWithSendMail(bool send = false)
-		{
-			if (!MailOpened || !BagOpened) return;
-			Window.Click(Window.MousePos, send);
-			Window.Click((300, 150), send);
-			Window.Click((310, 270), send);
 		}
 	}
 }
