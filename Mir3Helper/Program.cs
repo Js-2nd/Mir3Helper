@@ -7,7 +7,7 @@
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.2.5";
+		public const string Version = "0.2.7";
 		public static bool DebugOutput;
 
 		static async Task Main()
@@ -60,9 +60,9 @@
 					if (m_Running && m_Assist != null)
 					{
 						var action = await Update();
-						if (action == UpdateAction.Warp) delay = 1.6;
+						if (action == UpdateAction.Warp) delay = 1.7;
 						else if (action == UpdateAction.Skill) delay = 1.3;
-						else if (action == UpdateAction.LongSkill) delay = 2;
+						else if (action == UpdateAction.LongSkill) delay = 2.1;
 					}
 
 					await Task.Delay(TimeSpan.FromSeconds(delay));

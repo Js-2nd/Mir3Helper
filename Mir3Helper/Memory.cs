@@ -10,6 +10,7 @@ namespace Mir3Helper
 	public sealed class Memory
 	{
 		static readonly Encoding s_Encoding = Encoding.GetEncoding("gb2312");
+		static readonly StringBuilder s_Builder = new StringBuilder();
 
 		readonly IntPtr m_Handle;
 		readonly Dictionary<string, Address> m_Modules = new Dictionary<string, Address>();
@@ -108,5 +109,23 @@ namespace Mir3Helper
 		}
 
 		public (Memory, Address) Value(Address address) => (this, address);
+
+		public string Dump(Address address, int size)
+		{
+			size = ReadBuffer(address, size);
+			if (size == 0) return string.Empty;
+			s_Builder.Clear();
+			s_Builder.Append(m_Buffer[0].ToString("X2"));
+			for (int i = 1; i < size; i++)
+			{
+				if ((i & 0xF) == 0) s_Builder.AppendLine();
+				else s_Builder.Append(' ');
+				s_Builder.Append(m_Buffer[i].ToString("X2"));
+			}
+
+			string str = s_Builder.ToString();
+			s_Builder.Clear();
+			return str;
+		}
 	}
 }

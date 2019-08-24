@@ -1,7 +1,6 @@
 ﻿namespace Mir3Helper
 {
 	using System;
-	using System.Linq;
 	using System.Threading.Tasks;
 
 	partial class Program
@@ -64,7 +63,7 @@
 			{
 				if (m_Now >= m_SummonBeastTime && TrySummon(m_Assist, Skill.召唤神兽))
 				{
-					m_SummonBeastTime = m_Now + TimeSpan.FromSeconds(20);
+					m_SummonBeastTime = m_Now + TimeSpan.FromSeconds(10);
 					return UpdateAction.LongSkill;
 				}
 
@@ -74,7 +73,7 @@
 						? TrySummon(m_Assist, Skill.超强召唤骷髅)
 						: TrySummon(m_Assist, Skill.召唤骷髅))
 					{
-						m_SummonSkeletonTime = m_Now + TimeSpan.FromSeconds(20);
+						m_SummonSkeletonTime = m_Now + TimeSpan.FromSeconds(10);
 						return UpdateAction.LongSkill;
 					}
 				}
@@ -191,7 +190,12 @@
 			else if (skill == Skill.超强召唤骷髅) name = "超强骷髅";
 			else return false;
 			name = $"{name}({self.Name})";
-			if (self.GetOtherUnits().Any(unit => unit.Name == name)) return false;
+			foreach (var unit in self.GetOtherUnits())
+			{
+				string unitName = unit.Name;
+				if (string.IsNullOrWhiteSpace(unitName) || unitName == name) return false;
+			}
+
 			return self.TryCastSkill(skill);
 		}
 	}

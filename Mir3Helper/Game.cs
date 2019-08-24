@@ -72,7 +72,7 @@ namespace Mir3Helper
 				yield return (Memory, address);
 		}
 
-		void UpdateUnits(int range = 8)
+		void UpdateUnits(int range = 10)
 		{
 			if (m_UnitsCached) return;
 			m_UnitsCached = true;
@@ -191,21 +191,14 @@ namespace Mir3Helper
 		public bool TryCastSkill(Skill id, in UnitData target,
 			SkillPoison poison = SkillPoison.None, SkillAmulet amulet = SkillAmulet.None)
 		{
-			if (!target.IsValid) return false;
+			if (!target.IsValid || (target.Pos - Pos).Abs().MaxComponent > 8) return false;
 			var skill = GetSkill(id);
 			if (!skill.IsValid) return false;
-			if (Program.DebugOutput) Console.WriteLine($"{id.ToString()} => {target.Name}");
-			MousePos.Set(MapToScreen(target.Pos).ToInt32Pair());
-			switch (skill.TargetLock.Value)
-			{
-				case SkillTargetLock.Any:
-					SkillTarget.Set(target.Id);
-					break;
-				case SkillTargetLock.PlayerOnly:
-					SkillTargetPlayerOnly.Set(target.Id);
-					break;
-			}
-
+			if (Program.DebugOutput) Console.WriteLine($"Cast {id.ToString()} => {target.Name}");
+			var targetLock = skill.TargetLock.Value;
+			MousePos.Set((targetLock == SkillTargetLock.None ? MapToScreen(target.Pos) : (0xFFF, 0xFFF)).ToInt32Pair());
+			if (targetLock == SkillTargetLock.Any) SkillTarget.Set(target.Id);
+			else if (targetLock == SkillTargetLock.PlayerOnly) SkillTargetPlayerOnly.Set(target.Id);
 			if (poison != SkillPoison.None) skill.Poison.Set(poison);
 			if (amulet != SkillAmulet.None) skill.Amulet.Set(amulet);
 			var key = skill.Key;
