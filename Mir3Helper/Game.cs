@@ -245,14 +245,6 @@ namespace Mir3Helper
 			CoupleWarping = false;
 		}
 
-		public void SendMailWithMouseItem(bool send = false)
-		{
-			if (!MailOpened || !BagOpened) return;
-			Window.Click(Window.MousePos, send);
-			Window.Click((300, 150), send);
-			Window.Click((310, 270), send);
-		}
-
 		public void BagActionWithMouseItem(bool send = false)
 		{
 			if (!BagOpened) return;
@@ -265,6 +257,14 @@ namespace Mir3Helper
 			if (!BagOpened) return;
 			Window.Click(Window.MousePos, send);
 			Window.Click(YesButton, send);
+		}
+
+		public void SendMailWithMouseItem(bool send = false)
+		{
+			if (!MailOpened || !BagOpened) return;
+			Window.Click(Window.MousePos, send);
+			Window.Click((300, 150), send);
+			Window.Click((310, 270), send);
 		}
 	}
 }

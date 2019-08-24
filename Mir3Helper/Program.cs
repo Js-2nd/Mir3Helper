@@ -7,7 +7,7 @@
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.2.3";
+		public const string Version = "0.2.4";
 
 		static async Task Main()
 		{
@@ -35,9 +35,9 @@
 			Console.WriteLine("[End] Run / Pause");
 			Console.WriteLine("[`] Assist Warp");
 			Console.WriteLine("[Shift+`] Toggle Auto Assist Warp");
-			Console.WriteLine("[Shift+A] Bag Action With Mouse Item");
+			Console.WriteLine("[RightControl] Bag Action With Mouse Item");
+			Console.WriteLine("[Delete] Drop Mouse Item");
 			Console.WriteLine("[Shift+S] Send Mail With Mouse Item");
-			Console.WriteLine("[RightControl] Drop Mouse Item");
 			while (true)
 			{
 				try
@@ -99,7 +99,7 @@
 				}
 				else m_Assist?.CoupleWarp();
 			}
-			else if (key == VirtualKey.VK_A && m_Input.IsShiftDown())
+			else if (key == VirtualKey.VK_RCONTROL)
 			{
 				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.BagActionWithMouseItem();
 			}
@@ -107,7 +107,7 @@
 			{
 				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.SendMailWithMouseItem();
 			}
-			else if (key == VirtualKey.VK_RCONTROL)
+			else if (key == VirtualKey.VK_DELETE)
 			{
 				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.DropMouseItem();
 			}

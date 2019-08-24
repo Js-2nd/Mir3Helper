@@ -23,6 +23,7 @@ namespace Mir3Helper
 
 		public string Map => Memory.ReadString(0x6AD96D, 32);
 		public int SkillCount => Memory.Read<byte>(0x796EB0);
+		public string CoupleName => Memory.ReadString(0x7AAF00, 12);
 		public int Level => Memory.Read<ushort>(0x7AC451);
 		public UInt64Pair Exp => Memory.Read<UInt64Pair>(0x7AC438);
 		public Int16Pair Attack => Memory.Read<Int16Pair>(0x7AC45B);
