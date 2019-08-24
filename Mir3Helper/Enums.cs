@@ -14,6 +14,14 @@ namespace Mir3Helper
 		XBUTTON2 = 0x40,
 	}
 
+	public enum UpdateAction
+	{
+		Wait,
+		Warp,
+		Skill,
+		LongSkill,
+	}
+
 	public enum PlayerClass : byte
 	{
 		Warrior = 0,

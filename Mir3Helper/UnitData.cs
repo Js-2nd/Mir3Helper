@@ -24,6 +24,8 @@ namespace Mir3Helper
 		public bool RedPoison => Memory.Read<byte>(Address + 0x293).Bit(6);
 		public bool Moving => Memory.Read<bool>(Address + 0x2A9);
 
+		public bool IsDead => Hp == 0 && MaxHp > 0;
+
 		public static implicit operator UnitData(in Tuple t) => new UnitData(t);
 	}
 

@@ -7,7 +7,8 @@
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.2.4";
+		public const string Version = "0.2.5";
+		public static bool DebugOutput;
 
 		static async Task Main()
 		{
@@ -20,8 +21,9 @@
 
 		InputSystem m_Input;
 		bool m_Running;
-		bool m_HasUser;
+		bool m_AssistAttack;
 		bool m_AutoWarp = true;
+		bool m_HasUser;
 		Game m_User;
 		Game m_Assist;
 		Game m_Temp;
@@ -33,6 +35,7 @@
 			Console.WriteLine("[PageUp] Set User");
 			Console.WriteLine("[PageDown] Set Assist");
 			Console.WriteLine("[End] Run / Pause");
+			Console.WriteLine("[Insert] Toggle Assist Attack");
 			Console.WriteLine("[`] Assist Warp");
 			Console.WriteLine("[Shift+`] Toggle Auto Assist Warp");
 			Console.WriteLine("[RightControl] Bag Action With Mouse Item");
@@ -53,7 +56,16 @@
 						}
 					}
 
-					await Task.Delay(TimeSpan.FromSeconds(m_Running && m_Assist != null ? await Update() : 0.1));
+					double delay = 0.2;
+					if (m_Running && m_Assist != null)
+					{
+						var action = await Update();
+						if (action == UpdateAction.Warp) delay = 1.6;
+						else if (action == UpdateAction.Skill) delay = 1.3;
+						else if (action == UpdateAction.LongSkill) delay = 2;
+					}
+
+					await Task.Delay(TimeSpan.FromSeconds(delay));
 					GC.Collect();
 				}
 				catch (Exception ex)
@@ -90,6 +102,11 @@
 					Console.WriteLine(m_Running ? "Run" : "Pause");
 				}
 			}
+			else if (key == VirtualKey.VK_INSERT)
+			{
+				m_AssistAttack = !m_AssistAttack;
+				Console.WriteLine($"Assist Attack => {m_AssistAttack.ToString()}");
+			}
 			else if (key == VirtualKey.VK_OEM_3)
 			{
 				if (m_Input.IsShiftDown())
@@ -110,6 +127,11 @@
 			else if (key == VirtualKey.VK_DELETE)
 			{
 				if (Game.GetForeground(ref m_Temp) >= 0) m_Temp.DropMouseItem();
+			}
+			else if (key == VirtualKey.VK_PAUSE)
+			{
+				DebugOutput = !DebugOutput;
+				Console.WriteLine($"Debug Output => {DebugOutput.ToString()}");
 			}
 		}
 

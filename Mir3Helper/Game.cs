@@ -194,6 +194,7 @@ namespace Mir3Helper
 			if (!target.IsValid) return false;
 			var skill = GetSkill(id);
 			if (!skill.IsValid) return false;
+			if (Program.DebugOutput) Console.WriteLine($"{id.ToString()} => {target.Name}");
 			MousePos.Set(MapToScreen(target.Pos).ToInt32Pair());
 			switch (skill.TargetLock.Value)
 			{
@@ -221,11 +222,13 @@ namespace Mir3Helper
 		}
 
 		public bool CoupleWarping { get; private set; }
+		public DateTime LastWarpTime { get; private set; }
 
 		public async Task CoupleWarp(bool send = false)
 		{
 			if (CoupleWarping) return;
 			CoupleWarping = true;
+			LastWarpTime = DateTime.UtcNow;
 			bool opened = StatusOpened;
 			if (opened)
 			{
