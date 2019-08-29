@@ -63,7 +63,8 @@ namespace Mir3Helper
 		public Address UnitAddress(int x, int y) => Memory[0x6BACEC + x * 0x78 + y * 0xD98, 0];
 		public Point MapToScreen(Point mapPos) => (mapPos - Pos).Scale((48, 32)) + SelfScreenPos;
 
-		public Point ScreenSize => Memory.Read<Int32Pair>(0x6658D0);
+		public bool FullScreen => Memory.Read<bool>(0x6658D6);
+		public Point ScreenSize => Memory.Read<Int32Pair>(0x6658D8);
 		public Point SelfScreenPos => ScreenSize.X == 800 ? (400, 240) : (496, 338);
 		public int TotalOpened => Memory.Read<byte>(0x6EF680);
 		public bool StatusOpened => Memory.Read<bool>(0x76F92C);

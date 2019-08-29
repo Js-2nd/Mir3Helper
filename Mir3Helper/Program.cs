@@ -7,7 +7,7 @@
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.2.7";
+		public const string Version = "0.2.8";
 		public static bool DebugOutput;
 
 		static async Task Main()
