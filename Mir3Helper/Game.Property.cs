@@ -22,6 +22,8 @@ namespace Mir3Helper
 		public bool Mounting => Memory.Read<bool>(0x7AAF68);
 
 		public string Map => Memory.ReadString(0x6AD96D, 32);
+		public string WeaponName => Memory.ReadString(0x76FF12, 16);
+		public int WeaponDurability => Memory.Read<ushort>(0x76FF58);
 		public int SkillCount => Memory.Read<byte>(0x796EB0);
 		public string CoupleName => Memory.ReadString(0x7AAF00, 12);
 		public int Level => Memory.Read<ushort>(0x7AC451);

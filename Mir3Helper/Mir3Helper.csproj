@@ -94,6 +94,7 @@
     <Compile Include="Game.Property.cs" />
     <Compile Include="InputSystem.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="ItemData.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="MemoryValue.cs" />
     <Compile Include="Module.cs" />
