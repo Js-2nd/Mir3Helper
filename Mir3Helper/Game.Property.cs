@@ -22,8 +22,6 @@ namespace Mir3Helper
 		public bool Mounting => Memory.Read<bool>(0x7AAF68);
 
 		public string Map => Memory.ReadString(0x6AD96D, 32);
-		public string WeaponName => Memory.ReadString(0x76FF12, 16);
-		public int WeaponDurability => Memory.Read<ushort>(0x76FF58);
 		public int SkillCount => Memory.Read<byte>(0x796EB0);
 		public string CoupleName => Memory.ReadString(0x7AAF00, 12);
 		public int Level => Memory.Read<ushort>(0x7AC451);
@@ -64,6 +62,9 @@ namespace Mir3Helper
 
 		public Address UnitAddress(int x, int y) => Memory[0x6BACEC + x * 0x78 + y * 0xD98, 0];
 		public Point MapToScreen(Point mapPos) => (mapPos - Pos).Scale((48, 32)) + SelfScreenPos;
+		public ItemData PickUpItem => (Memory, 0x6EEF52);
+		public ItemData BagItem(int index) => (Memory, 0x6F5E99 + index * 0x339);
+		public ItemData WeaponItem => (Memory, 0x76FF12);
 
 		public bool FullScreen => Memory.Read<bool>(0x6658D6);
 		public Point ScreenSize => Memory.Read<Int32Pair>(0x6658D8);
