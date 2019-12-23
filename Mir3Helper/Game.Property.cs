@@ -44,6 +44,7 @@ namespace Mir3Helper
 		public MemoryValue<int> SkillTarget => Memory.Value(0x7AC63C);
 		public MemoryValue<int> SkillTargetPlayerOnly => Memory.Value(0x7AC640);
 		public MemoryValue<Int32Pair> MousePos => Memory.Value(0x7ADA44);
+		public BagData Bag => new BagData(Memory);
 		public BuffData Buff => new BuffData(Memory);
 
 		public int AttackElement(Element element)
@@ -63,7 +64,6 @@ namespace Mir3Helper
 		public Address UnitAddress(int x, int y) => Memory[0x6BACEC + x * 0x78 + y * 0xD98, 0];
 		public Point MapToScreen(Point mapPos) => (mapPos - Pos).Scale((48, 32)) + SelfScreenPos;
 		public ItemData PickUpItem => (Memory, 0x6EEF52);
-		public ItemData BagItem(int index) => (Memory, 0x6F5E99 + index * 0x339);
 		public ItemData WeaponItem => (Memory, 0x76FF12);
 
 		public bool FullScreen => Memory.Read<bool>(0x6658D6);
@@ -73,10 +73,6 @@ namespace Mir3Helper
 		public bool StatusOpened => Memory.Read<bool>(0x76F92C);
 		public Point StatusCloseButton => Memory.Read<Int32Pair>(0x76F9AC);
 		public Point StatusLeftRing => StatusCloseButton + (-255, 215);
-		public bool BagOpened => Memory.Read<bool>(0x6F3260);
-		public int BagScroll => Memory.Read<int>(0x6F32E0);
-		public Point BagCloseButton => Memory.Read<Int32Pair>(0x6F5878);
-		public Point BagAction => BagCloseButton + (-25, 10);
 		public bool SkillOpened => Memory.Read<bool>(0x7956A0);
 		public bool MiniMapOpened => Memory.Read<bool>(0x776AA4);
 		public bool MiniMapDoubled => Memory.Read<bool>(0x776B38);

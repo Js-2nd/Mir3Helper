@@ -61,6 +61,12 @@ namespace Mir3Helper
 				ScreenToClient(Handle, ref pos);
 				return pos;
 			}
+			set
+			{
+				PInvoke.POINT pos = value;
+				ClientToScreen(Handle, ref pos);
+				SetCursorPos(pos.x, pos.y);
+			}
 		}
 	}
 }

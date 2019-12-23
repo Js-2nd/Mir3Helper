@@ -88,9 +88,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Address.cs" />
+    <Compile Include="BagData.cs" />
     <Compile Include="BuffData.cs" />
     <Compile Include="CustomWindowMessage.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Game.DropOres.cs" />
     <Compile Include="Game.Property.cs" />
     <Compile Include="InputSystem.cs" />
     <Compile Include="Game.cs" />
