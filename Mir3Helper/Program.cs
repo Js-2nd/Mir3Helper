@@ -2,13 +2,16 @@
 {
 	using System;
 	using System.IO;
+	using System.Threading;
 	using System.Threading.Tasks;
 	using static PInvoke.User32;
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.2.8";
+		public const string Version = "0.3.0";
 		public static bool DebugOutput;
+		public static Random Random => s_Random.Value;
+		static readonly ThreadLocal<Random> s_Random = new ThreadLocal<Random>(() => new Random());
 
 		static async Task Main()
 		{
@@ -41,6 +44,7 @@
 			Console.WriteLine("[RightControl] Bag Action With Mouse Item");
 			Console.WriteLine("[Delete] Drop Mouse Item");
 			Console.WriteLine("[Shift+S] Send Mail With Mouse Item");
+			StartTasks();
 			while (true)
 			{
 				try
@@ -73,6 +77,11 @@
 					Console.Error.WriteLine(ex);
 				}
 			}
+		}
+
+		void StartTasks()
+		{
+			Task.Run(DropOres);
 		}
 
 		void HandleInput(VirtualKey key)

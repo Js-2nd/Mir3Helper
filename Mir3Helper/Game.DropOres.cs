@@ -5,20 +5,23 @@ namespace Mir3Helper
 
 	partial class Game
 	{
-		public async Task DropOres()
+		public bool CanDropOres => Hp > 0 && !PickUpItem.IsValid && IsPickaxeEquipped;
+
+		public async Task<int> DropOres()
 		{
-			if (PickUpItem.IsValid || !IsPickaxeEquipped) return;
+			if (!CanDropOres) return -1;
 			if (!Bag.IsOpened)
 			{
 				Window.KeyDown(VirtualKey.VK_W);
 				await Task.Delay(100);
-				if (!Bag.IsOpened) return;
+				if (!Bag.IsOpened) return -1;
 			}
 
+			int count = 0;
 			int scroll = Bag.Scroll;
 			for (int i = 0; i < 48; i++)
 			{
-				if (scroll != Bag.Scroll) return;
+				if (scroll != Bag.Scroll) break;
 				var item = Bag.Item(i, scroll);
 				if (item.IsValid)
 				{
@@ -26,28 +29,30 @@ namespace Mir3Helper
 					int durability = item.Durability;
 					if (ShouldDrop(name, durability))
 					{
-						if (PickUpItem.IsValid || !IsPickaxeEquipped) return;
-//						Console.WriteLine($"Drop {name} / {durability}");
+						if (!CanDropOres) break;
 						var pos = Bag.ItemPos(i);
 						Window.Click(pos);
-						await Task.Delay(500);
+						await Task.Delay(Program.Random.Next(300, 500));
 						if (PickUpItem.IsValid)
 						{
 							if (PickUpItem.Name == name && PickUpItem.Durability == durability)
 							{
 								Window.Click(YesButton);
-								await Task.Delay(1500);
+								++count;
+								await Task.Delay(Program.Random.Next(1200, 2000));
 							}
 							else // wrong item picked up
 							{
 								Window.Click(pos);
 								await Task.Delay(500);
-								return;
+								break;
 							}
 						}
 					}
 				}
 			}
+
+			return count;
 		}
 
 		bool IsPickaxeEquipped

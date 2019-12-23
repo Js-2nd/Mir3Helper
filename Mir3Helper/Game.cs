@@ -8,13 +8,15 @@ namespace Mir3Helper
 
 	public sealed partial class Game : IDisposable
 	{
+		public const string ProcessName = "mir3";
+
 		public static int GetForeground(ref Game game)
 		{
 			var window = GetForegroundWindow();
 			GetWindowThreadProcessId(window, out int processId);
 			if (game?.Process.Id == processId) return 0;
 			var process = Process.GetProcessById(processId);
-			if (process.ProcessName.ToLowerInvariant() != "mir3") return -1;
+			if (StringComparer.OrdinalIgnoreCase.Compare(process.ProcessName, ProcessName) != 0) return -1;
 			game = new Game(process);
 			return processId;
 		}

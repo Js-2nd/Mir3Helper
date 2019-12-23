@@ -89,15 +89,15 @@
 				}
 			}
 
-			if (m_AssistAttack && target != 0)
-			{
-				var unit = m_Assist.GetUnit(target);
-				if (unit.IsValid && !unit.IsDead)
-				{
-					if (unit.Type == UnitType.Player) m_Assist.AttackMode.Set(AttackMode.Group);
-					if (m_Assist.TryCastSkill(Skill.月魂灵波, unit)) return UpdateAction.Skill;
-				}
-			}
+//			if (m_AssistAttack && target != 0)
+//			{
+//				var unit = m_Assist.GetUnit(target);
+//				if (unit.IsValid && !unit.IsDead)
+//				{
+//					if (unit.Type == UnitType.Player) m_Assist.AttackMode.Set(AttackMode.Group);
+//					if (m_Assist.TryCastSkill(Skill.月魂灵波, unit)) return UpdateAction.Skill;
+//				}
+//			}
 
 			return UpdateAction.Wait;
 		}
