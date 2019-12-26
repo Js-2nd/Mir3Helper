@@ -8,17 +8,20 @@ namespace Mir3Helper
 	{
 		async Task DropOres()
 		{
+			await Task.Delay(TimeSpan.FromSeconds(5));
 			while (true)
 			{
+				Console.WriteLine($"{DateTime.Now} [DropOres] Start");
 				foreach (var process in Process.GetProcessesByName(Game.ProcessName))
 				{
-					await Task.Delay(TimeSpan.FromSeconds(Random.Next(5, 10)));
 					var game = new Game(process);
 					int count = await game.DropOres();
-					Console.WriteLine($"{DateTime.Now} {game.Name} DropOres {count}");
+					if (count >= 0) Console.WriteLine($"{DateTime.Now} [DropOres] {game.Name} => {count}");
 				}
 
-				await Task.Delay(TimeSpan.FromHours(2 + Random.NextDouble()));
+				var delay = TimeSpan.FromHours(2 + Random.NextDouble());
+				Console.WriteLine($"Next DropOres Time: {DateTime.Now + delay}");
+				await Task.Delay(delay);
 			}
 		}
 	}

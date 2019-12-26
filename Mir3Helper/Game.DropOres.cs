@@ -10,6 +10,8 @@ namespace Mir3Helper
 		public async Task<int> DropOres()
 		{
 			if (!CanDropOres) return -1;
+			Window.KeyDown(VirtualKey.VK_W);
+			await Task.Delay(100);
 			if (!Bag.IsOpened)
 			{
 				Window.KeyDown(VirtualKey.VK_W);
@@ -47,6 +49,27 @@ namespace Mir3Helper
 								await Task.Delay(500);
 								break;
 							}
+						}
+					}
+					else if (name.EndsWith("鹤嘴锄") && durability >= 1000 && CanDropOres && WeaponItem.Durability < 1000)
+					{
+						var pos = Bag.ItemPos(i);
+						Window.Click(pos);
+						await Task.Delay(500);
+						if (PickUpItem.IsValid)
+						{
+							bool opened = StatusOpened;
+							if (opened)
+							{
+								Window.KeyDown(VirtualKey.VK_Q);
+								await Task.Delay(100);
+							}
+
+							Window.KeyDown(VirtualKey.VK_Q);
+							await Task.Delay(100);
+							Window.Click(StatusWeaponPos);
+							await Task.Delay(1500);
+							if (!opened) Window.KeyDown(VirtualKey.VK_Q);
 						}
 					}
 				}

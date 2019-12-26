@@ -1,6 +1,8 @@
 ﻿namespace Mir3Helper
 {
 	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 	using System.Threading.Tasks;
 
 	partial class Program
@@ -35,7 +37,7 @@
 					return UpdateAction.Warp;
 				}
 
-				target = GetAttackTarget(m_User, true);
+				target = GetAttackTarget(m_User, m_AssistMode != AssistMode.Active);
 				if (target != 0 && TryPoison(m_Assist, target)) return UpdateAction.Skill;
 			}
 
@@ -59,7 +61,7 @@
 			if (TryBuff(m_Assist, m_Assist, Skill.幽灵盾) ||
 			    TryBuff(m_Assist, m_Assist, Skill.神圣战甲术)) return UpdateAction.Skill;
 
-			if (m_AssistAttack && m_Now >= m_Assist.LastWarpTime + TimeSpan.FromSeconds(3))
+			if (m_AssistMode != AssistMode.Minimal && m_Now >= m_Assist.LastWarpTime + TimeSpan.FromSeconds(3))
 			{
 				if (m_Now >= m_SummonBeastTime && TrySummon(m_Assist, Skill.召唤神兽))
 				{
@@ -67,15 +69,11 @@
 					return UpdateAction.LongSkill;
 				}
 
-				if (m_Now >= m_SummonSkeletonTime)
+				if (m_Now >= m_SummonSkeletonTime &&
+				    (TrySummon(m_Assist, Skill.超强召唤骷髅) || TrySummon(m_Assist, Skill.召唤骷髅)))
 				{
-					if (m_Assist.GetSkill(Skill.超强召唤骷髅).IsValid
-						? TrySummon(m_Assist, Skill.超强召唤骷髅)
-						: TrySummon(m_Assist, Skill.召唤骷髅))
-					{
-						m_SummonSkeletonTime = m_Now + TimeSpan.FromSeconds(10);
-						return UpdateAction.LongSkill;
-					}
+					m_SummonSkeletonTime = m_Now + TimeSpan.FromSeconds(10);
+					return UpdateAction.LongSkill;
 				}
 			}
 
@@ -89,17 +87,32 @@
 				}
 			}
 
-//			if (m_AssistAttack && target != 0)
-//			{
-//				var unit = m_Assist.GetUnit(target);
-//				if (unit.IsValid && !unit.IsDead)
-//				{
-//					if (unit.Type == UnitType.Player) m_Assist.AttackMode.Set(AttackMode.Group);
-//					if (m_Assist.TryCastSkill(Skill.月魂灵波, unit)) return UpdateAction.Skill;
-//				}
-//			}
+			if (m_AssistMode != AssistMode.Minimal && target != 0)
+			{
+				var unit = m_Assist.GetUnit(target);
+				if (unit.IsValid && !unit.IsDead)
+				{
+					if (unit.Type == UnitType.Player) m_Assist.AttackMode.Set(AttackMode.Group);
+					var assistClass = m_Assist.Class;
+					if (assistClass == PlayerClass.Mage ||
+					    assistClass == PlayerClass.Taoist && m_AssistMode == AssistMode.Active)
+						foreach (var element in GetSortedElements(m_Assist, unit))
+						foreach (var skill in assistClass.GetAttackSkills(element))
+							if (m_Assist.TryCastSkill(skill, unit))
+								return UpdateAction.Skill;
+				}
+			}
 
 			return UpdateAction.Wait;
+		}
+
+		IEnumerable<Element> GetSortedElements(Game self, UnitData target = default)
+		{
+			var targetType = target.IsValid ? target.Type : UnitType.None;
+			return self.Class.GetAttackElements().OrderByDescending(e =>
+				self.AttackElement(e) *
+				(targetType == UnitType.Monster ? target.MonsterResist(e).ResistToMultiplier() : 1) +
+				0.0625 * Random.NextDouble());
 		}
 
 		int GetAttackTarget(Game unit, bool strict = false)
@@ -144,7 +157,7 @@
 			switch (unit.Type)
 			{
 				case UnitType.Monster:
-					if (unit.MaxHp <= 1200) return false;
+					if (unit.MaxHp < 500) return false;
 					break;
 				case UnitType.Player:
 					if (self.AttackMode == AttackMode.Peace) self.AttackMode.Set(AttackMode.Group);

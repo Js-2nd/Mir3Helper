@@ -49,4 +49,11 @@ namespace Mir3Helper
 		Guild = 3,
 		EvilOnly = 4,
 	}
+
+	public enum AssistMode : byte
+	{
+		Minimal = 0,
+		Passive = 1,
+		Active = 2,
+	}
 }

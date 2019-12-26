@@ -35,6 +35,7 @@ namespace Mir3Helper
 
 	public enum UnitType
 	{
+		None = 0,
 		Monster = 0x57AC74,
 		Npc = 0x57B34C,
 		Player = 0x57D644,

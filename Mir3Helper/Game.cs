@@ -233,7 +233,7 @@ namespace Mir3Helper
 
 			Window.KeyDown(VirtualKey.VK_Q, send);
 			await Task.Delay(20);
-			Window.DoubleClick(StatusLeftRing, send);
+			Window.DoubleClick(StatusLeftRingPos, send);
 			if (!opened)
 			{
 				await Task.Delay(20);

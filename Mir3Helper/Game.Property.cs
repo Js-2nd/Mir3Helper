@@ -71,8 +71,9 @@ namespace Mir3Helper
 		public Point SelfScreenPos => ScreenSize.X == 800 ? (400, 240) : (496, 338);
 		public int TotalOpened => Memory.Read<byte>(0x6EF680);
 		public bool StatusOpened => Memory.Read<bool>(0x76F92C);
-		public Point StatusCloseButton => Memory.Read<Int32Pair>(0x76F9AC);
-		public Point StatusLeftRing => StatusCloseButton + (-255, 215);
+		Point StatusCloseButtonTopLeft => Memory.Read<Int32Pair>(0x76F9AC);
+		public Point StatusLeftRingPos => StatusCloseButtonTopLeft + (-255, 215);
+		public Point StatusWeaponPos => StatusCloseButtonTopLeft + (-215, 160);
 		public bool SkillOpened => Memory.Read<bool>(0x7956A0);
 		public bool MiniMapOpened => Memory.Read<bool>(0x776AA4);
 		public bool MiniMapDoubled => Memory.Read<bool>(0x776B38);

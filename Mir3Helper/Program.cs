@@ -8,7 +8,7 @@
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.3.0";
+		public const string Version = "0.3.1";
 		public static bool DebugOutput;
 		public static Random Random => s_Random.Value;
 		static readonly ThreadLocal<Random> s_Random = new ThreadLocal<Random>(() => new Random());
@@ -24,9 +24,9 @@
 
 		InputSystem m_Input;
 		bool m_Running;
-		bool m_AssistAttack;
 		bool m_AutoWarp = true;
 		bool m_HasUser;
+		AssistMode m_AssistMode;
 		Game m_User;
 		Game m_Assist;
 		Game m_Temp;
@@ -38,10 +38,10 @@
 			Console.WriteLine("[PageUp] Set User");
 			Console.WriteLine("[PageDown] Set Assist");
 			Console.WriteLine("[End] Run / Pause");
-			Console.WriteLine("[Insert] Toggle Assist Attack");
+			Console.WriteLine("[Insert] Change Assist Mode");
 			Console.WriteLine("[`] Assist Warp");
 			Console.WriteLine("[Shift+`] Toggle Auto Assist Warp");
-			Console.WriteLine("[RightControl] Bag Action With Mouse Item");
+			Console.WriteLine("[RightControl] Bag Action With Mouse Item (Repair/Save/Sell)");
 			Console.WriteLine("[Delete] Drop Mouse Item");
 			Console.WriteLine("[Shift+S] Send Mail With Mouse Item");
 			StartTasks();
@@ -113,8 +113,8 @@
 			}
 			else if (key == VirtualKey.VK_INSERT)
 			{
-				m_AssistAttack = !m_AssistAttack;
-				Console.WriteLine($"Assist Attack => {m_AssistAttack.ToString()}");
+				m_AssistMode = (AssistMode) (((int) m_AssistMode + 1) % 3);
+				Console.WriteLine($"Assist Mode => {(int) m_AssistMode} ({m_AssistMode.ToString()})");
 			}
 			else if (key == VirtualKey.VK_OEM_3)
 			{
