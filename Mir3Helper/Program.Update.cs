@@ -69,11 +69,14 @@
 					return UpdateAction.LongSkill;
 				}
 
-				if (m_Now >= m_SummonSkeletonTime &&
-				    (TrySummon(m_Assist, Skill.超强召唤骷髅) || TrySummon(m_Assist, Skill.召唤骷髅)))
+				if (m_Now >= m_SummonSkeletonTime)
 				{
-					m_SummonSkeletonTime = m_Now + TimeSpan.FromSeconds(10);
-					return UpdateAction.LongSkill;
+					var skill = m_Assist.GetSkill(Skill.超强召唤骷髅).IsValid ? Skill.超强召唤骷髅 : Skill.召唤骷髅;
+					if (TrySummon(m_Assist, skill))
+					{
+						m_SummonSkeletonTime = m_Now + TimeSpan.FromSeconds(10);
+						return UpdateAction.LongSkill;
+					}
 				}
 			}
 
@@ -157,7 +160,7 @@
 			switch (unit.Type)
 			{
 				case UnitType.Monster:
-					if (unit.MaxHp < 500) return false;
+					if (unit.MaxHp < (m_AssistMode == AssistMode.Minimal ? 1250 : 500)) return false;
 					break;
 				case UnitType.Player:
 					if (self.AttackMode == AttackMode.Peace) self.AttackMode.Set(AttackMode.Group);

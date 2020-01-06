@@ -8,7 +8,7 @@
 
 	public sealed partial class Program
 	{
-		public const string Version = "0.3.1";
+		public const string Version = "0.3.2";
 		public static bool DebugOutput;
 		public static Random Random => s_Random.Value;
 		static readonly ThreadLocal<Random> s_Random = new ThreadLocal<Random>(() => new Random());
