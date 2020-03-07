@@ -135,18 +135,16 @@ namespace Mir3Helper
 			else m_SkillKeys = new Dictionary<SkillKey, int>();
 			if (m_SkillEscKeys != null) m_SkillEscKeys.Clear();
 			else m_SkillEscKeys = new Dictionary<SkillEscKey, int>();
-			for (int i = 0, count = SkillCount; i < count; i++)
+			for (int i = 0; i < 30; i++)
 			{
 				SkillData skill = (Memory, i);
 				var id = skill.Id;
-				if (id != Skill.None)
-				{
-					m_Skills[id] = i;
-					var key = skill.Key;
-					if (key != SkillKey.None) m_SkillKeys[key] = i;
-					var escKey = skill.EscKey.Value;
-					if (escKey != SkillEscKey.None) m_SkillEscKeys[escKey] = i;
-				}
+				if (id == Skill.None) break;
+				m_Skills[id] = i;
+				var key = skill.Key;
+				if (key != SkillKey.None) m_SkillKeys[key] = i;
+				var escKey = skill.EscKey.Value;
+				if (escKey != SkillEscKey.None) m_SkillEscKeys[escKey] = i;
 			}
 		}
 
@@ -198,7 +196,7 @@ namespace Mir3Helper
 			if (!skill.IsValid) return false;
 			if (Program.DebugOutput) Console.WriteLine($"Cast {id.ToString()} => {target.Name}");
 			var targetLock = skill.TargetLock.Value;
-			MousePos.Set((targetLock == SkillTargetLock.None ? MapToScreen(target.Pos) : (0xFFF, 0xFFF)).ToInt32Pair());
+			MouseScreenPos.Set((targetLock == SkillTargetLock.None ? MapToScreen(target.Pos) : (0xFFF, 0xFFF)).ToInt32Pair());
 			if (targetLock == SkillTargetLock.Any) SkillTarget.Set(target.Id);
 			else if (targetLock == SkillTargetLock.PlayerOnly) SkillTargetPlayerOnly.Set(target.Id);
 			if (poison != SkillPoison.None) skill.Poison.Set(poison);

@@ -19,7 +19,7 @@ namespace Mir3Helper
 					if (count >= 0) Console.WriteLine($"{DateTime.Now} [DropOres] {game.Name} => {count}");
 				}
 
-				var delay = TimeSpan.FromHours(2 + Random.NextDouble());
+				var delay = TimeSpan.FromHours(1 + Random.NextDouble());
 				Console.WriteLine($"Next DropOres Time: {DateTime.Now + delay}");
 				await Task.Delay(delay);
 			}

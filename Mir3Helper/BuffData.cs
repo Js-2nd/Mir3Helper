@@ -2,22 +2,24 @@ namespace Mir3Helper
 {
 	public readonly struct BuffData
 	{
+		const int BaseAddress = 0x79FAC4;
+
 		public readonly Memory Memory;
 		public BuffData(Memory memory) => Memory = memory;
 
-		public int Attack => Memory.Read<int>(0x7D53C8);
-		public int Magic => Memory.Read<int>(0x7D53E0);
-		public int AttackFire => Memory.Read<int>(0x7D53E4);
-		public int AttackIce => Memory.Read<int>(0x7D53E8);
-		public int AttackThunder => Memory.Read<int>(0x7D53EC);
-		public int AttackWind => Memory.Read<int>(0x7D53F0);
-		public int AttackHoly => Memory.Read<int>(0x7D53F4);
-		public int Defense => Memory.Read<int>(0x7D53CC);
-		public int Resist => Memory.Read<int>(0x7D53C4);
-		public int ResistFire => Memory.Read<int>(0x7D53D0);
-		public int ResistIce => Memory.Read<int>(0x7D53D4);
-		public int ResistThunder => Memory.Read<int>(0x7D53D8);
-		public int ResistWind => Memory.Read<int>(0x7D53DC);
+		public int Attack => Memory.Read<int>(BaseAddress + 0x4);
+		public int Magic => Memory.Read<int>(BaseAddress + 0x1C);
+		public int AttackFire => Memory.Read<int>(BaseAddress + 0x20);
+		public int AttackIce => Memory.Read<int>(BaseAddress + 0x24);
+		public int AttackThunder => Memory.Read<int>(BaseAddress + 0x28);
+		public int AttackWind => Memory.Read<int>(BaseAddress + 0x2C);
+		public int AttackHoly => Memory.Read<int>(BaseAddress + 0x30);
+		public int Defense => Memory.Read<int>(BaseAddress + 0x8);
+		public int Resist => Memory.Read<int>(BaseAddress + 0x0);
+		public int ResistFire => Memory.Read<int>(BaseAddress + 0xC);
+		public int ResistIce => Memory.Read<int>(BaseAddress + 0x10);
+		public int ResistThunder => Memory.Read<int>(BaseAddress + 0x14);
+		public int ResistWind => Memory.Read<int>(BaseAddress + 0x18);
 
 		public bool CanReceive(Skill skill, SkillAmulet amulet = SkillAmulet.None, int ignoreTime = 5)
 		{

@@ -20,58 +20,47 @@ namespace Mir3Helper
 			}
 
 			int count = 0;
-			int scroll = Bag.Scroll;
-			for (int i = 0; i < 48; i++)
+			for (int i = 0; i < 600; i++)
 			{
-				if (scroll != Bag.Scroll) break;
-				var item = Bag.Item(i, scroll);
-				if (item.IsValid)
+				var item = Bag.Item(i);
+				if (!item.IsValid) continue;
+				string name = item.Name;
+				int durability = item.Durability;
+				if (ShouldDrop(name, durability))
 				{
-					string name = item.Name;
-					int durability = item.Durability;
-					if (ShouldDrop(name, durability))
+					if (!CanDropOres) break;
+					await Bag.EnsureItemVisible(i);
+					var pos = Bag.ItemPosByIndex(i);
+					if (pos == null) continue;
+					Window.Click(pos.Value);
+					await Task.Delay(500);
+					if (!PickUpItem.IsValid) continue;
+					if (PickUpItem.Name != name || PickUpItem.Durability != durability) break;
+					Window.Click(YesButton);
+					await Task.Delay(Program.Random.Next(1500, 2500));
+					if (PickUpItem.IsValid) break;
+					++count;
+				}
+				else if (name.EndsWith("鹤嘴锄") && durability >= 1000 && CanDropOres && WeaponItem.Durability < 1000)
+				{
+					await Bag.EnsureItemVisible(i);
+					var pos = Bag.ItemPosByIndex(i);
+					if (pos == null) continue;
+					Window.Click(pos.Value);
+					await Task.Delay(500);
+					if (!PickUpItem.IsValid) continue;
+					bool opened = StatusOpened;
+					if (opened)
 					{
-						if (!CanDropOres) break;
-						var pos = Bag.ItemPos(i);
-						Window.Click(pos);
-						await Task.Delay(Program.Random.Next(300, 500));
-						if (PickUpItem.IsValid)
-						{
-							if (PickUpItem.Name == name && PickUpItem.Durability == durability)
-							{
-								Window.Click(YesButton);
-								++count;
-								await Task.Delay(Program.Random.Next(1200, 2000));
-							}
-							else // wrong item picked up
-							{
-								Window.Click(pos);
-								await Task.Delay(500);
-								break;
-							}
-						}
+						Window.KeyDown(VirtualKey.VK_Q);
+						await Task.Delay(100);
 					}
-					else if (name.EndsWith("鹤嘴锄") && durability >= 1000 && CanDropOres && WeaponItem.Durability < 1000)
-					{
-						var pos = Bag.ItemPos(i);
-						Window.Click(pos);
-						await Task.Delay(500);
-						if (PickUpItem.IsValid)
-						{
-							bool opened = StatusOpened;
-							if (opened)
-							{
-								Window.KeyDown(VirtualKey.VK_Q);
-								await Task.Delay(100);
-							}
 
-							Window.KeyDown(VirtualKey.VK_Q);
-							await Task.Delay(100);
-							Window.Click(StatusWeaponPos);
-							await Task.Delay(1500);
-							if (!opened) Window.KeyDown(VirtualKey.VK_Q);
-						}
-					}
+					Window.KeyDown(VirtualKey.VK_Q);
+					await Task.Delay(100);
+					Window.Click(StatusWeaponPos);
+					await Task.Delay(1500);
+					if (!opened) Window.KeyDown(VirtualKey.VK_Q);
 				}
 			}
 
@@ -92,8 +81,8 @@ namespace Mir3Helper
 			switch (name)
 			{
 				case "铜矿": return true;
-				case "铁矿": return durability < 15000;
-//				case "银矿": return false;
+				case "铁矿": return durability < 16000;
+				case "银矿": return durability < 4000;
 //				case "金矿": return false;
 //				case "黑铁": return false;
 				case "紫水晶":

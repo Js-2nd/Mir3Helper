@@ -11,7 +11,7 @@ namespace Mir3Helper
 		public SkillData(in Tuple t)
 		{
 			(Memory, Index) = t;
-			Address = Memory?[0x7D83E0, Index * 0x110] ?? default;
+			Address = Memory?[0x7A2AE0, Index * 0x110] ?? default;
 		}
 
 		public bool IsValid => Memory != null && Address.Value != 0;
